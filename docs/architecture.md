@@ -24,6 +24,12 @@
 
 生成目录被 Git 忽略，不接受人工编辑。公开仓库中的事实来源永远是 Lab 作者源码、样式入口、构建配置和构建工具。
 
+## Local preview boundary
+
+需要本地交互开发的 Lab 可以提供薄 Vite 壳层，但壳层只负责挂载、开发错误边界和运行时适配，不复制业务页面。Vite 与 Canvas 发布构建共同使用 `scripts/lib.mjs` 生成 `@yida-lab/runtime`，因此页面路由和服务地址的逻辑键保持一致。
+
+本地预览用于 HMR、组件测试和快速错误反馈；真实宜搭页面继续用于验证平台依赖装配、Canvas 浮层行为、主题变量和浏览器本地网络授权。两层验证互补，不能用本地预览结果替代远端发布回归。
+
 ## Application and page identity
 
 `manifest.json` 用稳定的逻辑键描述应用和页面，不保存某个组织中的真实资源 ID。一个 Lab 可以声明多个页面，每个页面都有独立源码、构建方式、发布目标和远端基线。`config/targets.local.json` 将这些逻辑键映射为当前测试环境的 `appType` 与 `formUuid`。

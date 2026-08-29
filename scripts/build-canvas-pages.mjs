@@ -1,7 +1,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { build } from 'esbuild';
-import { createPageRouteMap, createServiceUrlMap, loadManifest, readJson, root, run } from './lib.mjs';
+import {
+  createLabRuntimeModule,
+  createPageRouteMap,
+  createServiceUrlMap,
+  loadManifest,
+  readJson,
+  root,
+  run,
+} from './lib.mjs';
 import { createCanvasPublishSource, createCanvasRuntimeSource } from './tailwind-build-lib.mjs';
 
 const requireTargets = process.argv.includes('--require-targets');
@@ -51,19 +59,7 @@ for (const page of manifest.pages) {
     output = createCanvasRuntimeSource(authorSource, routes);
   } else if (page.build?.kind === 'esbuild-canvas') {
     const contract = await readJson(page.contract);
-    const runtimeModule = `
-const PAGE_ROUTES = ${JSON.stringify(routes)};
-const SERVICE_URLS = ${JSON.stringify(services)};
-export function getLabPageUrl(key) {
-  const value = PAGE_ROUTES[key];
-  if (!value) throw new Error('Unknown Yida Lab page key: ' + key);
-  return value;
-}
-export function getLabServiceUrl(key) {
-  const value = SERVICE_URLS[key];
-  if (!value) throw new Error('Unknown Yida Lab service key: ' + key);
-  return value;
-}`;
+    const runtimeModule = createLabRuntimeModule({ routes, services });
     const result = await build({
       entryPoints: [authorSourcePath],
       bundle: true,

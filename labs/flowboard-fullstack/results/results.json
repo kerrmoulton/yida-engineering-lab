@@ -13,6 +13,10 @@
     "update": "passed",
     "delete": "passed",
     "search": "passed",
+    "viteLocalPreview": "passed",
+    "hotModuleReplacementWithStatePreservation": "passed",
+    "frontendComponentTests": "passed",
+    "visibleContractErrorFeedback": "passed",
     "requestIdCorrelation": "passed",
     "corsAndPrivateNetworkPreflight": "passed"
   },
@@ -25,6 +29,7 @@
   ],
   "notes": [
     "Real app and form identifiers remain in ignored local configuration only.",
-    "The API uses an in-memory store and resets when the server restarts."
+    "The API uses an in-memory store and resets when the server restarts.",
+    "Local preview and Canvas publishing resolve the same virtual runtime module generator."
   ]
 }

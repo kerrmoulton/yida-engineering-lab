@@ -91,6 +91,23 @@ export function createPageRouteMap(manifest, { requireRemote = false } = {}) {
   );
 }
 
+export function createLabRuntimeModule({ routes, services }) {
+  return `
+const PAGE_ROUTES = ${JSON.stringify(routes)};
+const SERVICE_URLS = ${JSON.stringify(services)};
+export function getLabPageUrl(key) {
+  const value = PAGE_ROUTES[key];
+  if (!value) throw new Error('Unknown Yida Lab page key: ' + key);
+  return value;
+}
+export function getLabServiceUrl(key) {
+  const value = SERVICE_URLS[key];
+  if (!value) throw new Error('Unknown Yida Lab service key: ' + key);
+  return value;
+}
+`;
+}
+
 export async function loadTarget({ requireRemote = false, pageKey } = {}) {
   const manifest = await loadManifest();
   const selectedKey = pageKey || readArg('--page') || process.env.YIDA_LAB_PAGE || null;

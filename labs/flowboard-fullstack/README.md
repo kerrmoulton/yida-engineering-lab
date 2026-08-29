@@ -5,6 +5,8 @@
 ## 目录
 
 - `web/src/`：Canvas 页面、组件、样式与 API 客户端。
+- `web/preview/`：只负责挂载 Canvas 入口和显示开发状态的 Vite 壳层。
+- `web/test/`：Vitest + Testing Library 组件测试和浏览器环境适配。
 - `server/src/`：Express 应用、内存任务仓库与启动入口。
 - `server/test/`：HTTP、CORS/PNA、校验与 CRUD 集成测试。
 - `shared/`：前后端共同使用的任务类型与运行时解析器。
@@ -16,16 +18,25 @@
 
 ```bash
 npm install
-npm run dev:flowboard:api
+npm run dev:flowboard
 ```
 
-API 地址为 `http://127.0.0.1:4318/api`。首次从 HTTPS 宜搭页面调用本地 API 时，浏览器可能询问是否允许该站点访问本地网络；允许后刷新页面即可继续。服务使用内存数据，重启会恢复三条种子任务。
+该命令并行启动两个进程：
+
+- Vite 本地 Canvas 预览：`http://127.0.0.1:4317`
+- TypeScript API：`http://127.0.0.1:4318/api`
+
+Vite 直接导入 `web/src/Flowboard.canvas.jsx`，不会维护另一份预览页面。保存组件或样式后由 React Fast Refresh 更新页面并尽量保留表单状态；编译错误由 Vite 错误浮层显示，运行时渲染错误由预览壳的 Error Boundary 显示。
+
+首次从 HTTPS 宜搭页面调用本地 API 时，浏览器可能询问是否允许该站点访问本地网络；允许后刷新页面即可继续。服务使用内存数据，重启会恢复三条种子任务。
 
 另开终端运行确定性检查：
 
 ```bash
 npm run typecheck:flowboard
 npm run test:flowboard
+npm run test:flowboard:web
+npm run build:flowboard:web
 npm run build:canvas
 npm run contract:check
 ```
@@ -46,5 +57,7 @@ npm run verify:flowboard
 - 标题、说明和负责人搜索由 API 查询参数驱动。
 - 页面展示最近请求 ID，服务端结构化日志记录同一个 `X-Request-Id`。
 - CORS 和 Private Network Access 预检通过，API 仅监听回环地址。
+- 同一份 Canvas 入口可以由 Vite 本地加载，保存后通过 HMR 更新并保留未提交输入。
+- 组件测试覆盖 API 读取、任务创建和契约错误可视化反馈。
 
 实验中发现 Canvas 运行时内的浮层确认组件回调并不稳定，因此删除交互改为页面级受控 `Modal`。这项兼容性结论已固化在源码和浏览器回归结果中。

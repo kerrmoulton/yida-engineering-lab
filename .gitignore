@@ -2,6 +2,7 @@ node_modules/
 .cache/
 project/.cache/
 labs/*/dist/
+labs/*/dist-preview/
 .local/
 config/targets.local.json
 release/baseline.*.json

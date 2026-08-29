@@ -32,13 +32,14 @@ cp config/targets.example.json config/targets.local.json
 npm install
 npm run check
 npm run build:canvas
-npm run dev:flowboard:api
+npm run dev:flowboard
+npm run test:flowboard:web
 npm run guard:live -- --page tailwind.runtime
 npm run publish:test -- --page tailwind.runtime
 npm run verify:remote -- --page tailwind.runtime
 ```
 
-Flowboard 联调时先启动本地 API，再打开已发布的 Canvas 页面，并在浏览器首次提示时允许该宜搭域名访问本地网络。服务只监听 `127.0.0.1:4318`，重启后内存数据会恢复为种子任务。
+`npm run dev:flowboard` 会同时启动 Vite Canvas 预览和 TypeScript API：页面位于 `http://127.0.0.1:4317`，API 位于 `http://127.0.0.1:4318/api`。本地预览直接加载同一份 `.canvas.jsx` 作者源码并支持 HMR；发布到宜搭后的联调仍需在浏览器首次提示时允许该域名访问本地网络。
 
 本地检查会遍历 manifest 中的全部页面；守卫、发布和远端回读必须用 `--page` 明确指定一个逻辑页面，避免误覆盖。发布会先检查线上漂移，再执行 Canvas 发布和健康检查，最后为该页面单独更新本机基线。检测到线上内容偏离基线时会停止，不自动覆盖远端。
 

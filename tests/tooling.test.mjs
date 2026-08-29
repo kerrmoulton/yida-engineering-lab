@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import test from 'node:test';
 import { assessLiveBaseline } from '../scripts/check-live-baseline.mjs';
 import {
+  createLabRuntimeModule,
   createPageRouteMap,
   digest,
   extractJsonDocuments,
@@ -70,6 +71,17 @@ test('page route map uses logical keys and supports target-free public builds', 
     'page.two': '#unconfigured-page=page.two',
   });
   assert.throws(() => createPageRouteMap(manifest, { requireRemote: true }), /page.two/);
+});
+
+test('local preview and Canvas builds can share one virtual runtime module', () => {
+  const source = createLabRuntimeModule({
+    routes: { 'flowboard.board': '/APP_TEST/workbench/FORM_FLOWBOARD' },
+    services: { flowboardApi: 'http://127.0.0.1:4318/api' },
+  });
+  assert.match(source, /getLabPageUrl/);
+  assert.match(source, /getLabServiceUrl/);
+  assert.match(source, /FORM_FLOWBOARD/);
+  assert.match(source, /127\.0\.0\.1:4318/);
 });
 
 test('tracked Tailwind author source uses a normal CSS import', async () => {
