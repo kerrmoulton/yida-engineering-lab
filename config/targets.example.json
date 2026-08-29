@@ -2,6 +2,12 @@
   "applicationName": "My Yida Test Application",
   "appType": "APP_REPLACE_WITH_YOUR_TEST_APP",
   "webOrigin": "https://your-organization.aliwork.com",
+  "browserAuth": {
+    "organization": {
+      "corpId": "ding_REPLACE_WITH_TEST_ORGANIZATION",
+      "corpName": "My Test Organization"
+    }
+  },
   "pages": {
     "tailwind.runtime": {
       "formUuid": "FORM-REPLACE-WITH-RUNTIME-PAGE"
@@ -16,6 +22,11 @@
   "services": {
     "flowboardApi": {
       "baseUrl": "http://127.0.0.1:4318/api"
+    }
+  },
+  "connectors": {
+    "flowboardApi": {
+      "connectorId": "Http_REPLACE_WITH_YIDA_TEST_CONNECTOR"
     }
   }
 }

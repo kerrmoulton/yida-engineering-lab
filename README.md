@@ -24,7 +24,7 @@ Yida Engineering Lab 是面向宜搭 Code Canvas 的可复用工程能力实验�
 cp config/targets.example.json config/targets.local.json
 ```
 
-然后填写自己有权限操作的测试应用，以及每个逻辑页面键对应的 display 页面 `formUuid`。`config/targets.local.json` 已被 Git 忽略。本地格式、Lint、契约、单测和构建不依赖真实目标；只有远端守卫、发布和回读要求该配置。
+然后填写自己有权限操作的测试应用、浏览器自动化使用的测试组织，以及每个逻辑页面键对应的 display 页面 `formUuid`。`config/targets.local.json` 已被 Git 忽略，真实组织、应用、页面和连接器标识都不会进入仓库。本地格式、Lint、契约、单测和构建不依赖真实目标；只有远端守卫、发布和回读要求该配置。
 
 `manifest.json` 管理可读且稳定的页面键，例如 `tailwind.runtime`；本地配置只管理环境相关的真实 ID。页面源码通过 `getLabPageUrl('tailwind.runtime')` 引用其他页面，构建产物才会注入当前应用的实际路由。因此复制应用后只需更换本地映射，不需要修改源码。
 
@@ -40,6 +40,9 @@ npm run reset:flowboard:db
 npm run test:flowboard:web
 npm run test:flowboard:e2e
 npm run test:flowboard:remote
+npm run test:flowboard:remote:direct
+npm run test:flowboard:remote:connector
+npm run tunnel:flowboard
 npm run guard:live -- --page tailwind.runtime
 npm run publish:test -- --page tailwind.runtime
 npm run verify:remote -- --page tailwind.runtime
@@ -49,7 +52,7 @@ npm run verify:remote -- --page tailwind.runtime
 
 首次运行浏览器 E2E 前执行 `npx playwright install chromium`。`npm run check` 运行不依赖浏览器的格式、Lint、类型、单测和构建检查；`npm run check:full` 在此基础上增加 Playwright 本地全链路测试。
 
-`npm run test:flowboard:remote` 会启动本地 API，并用独立且被 Git 忽略的 Chrome profile 打开真实宜搭页面，执行只读首屏冒烟检查。首次运行可能需要在打开的窗口里登录；后续复用该 profile。测试会自动授予页面本地网络访问权限，断言 Flowboard 标题、API 在线状态、任务卡片和页面运行时错误，并把截图与结构化证据写入 `.cache/playwright/flowboard/`。
+`npm run test:flowboard:remote:direct` 和 `npm run test:flowboard:remote:connector` 会启动本地 API，并用独立且被 Git 忽略的 Chrome profile 打开真实宜搭页面，分别验证 localhost 与宜搭连接器。脚本会复用 profile；统一认证已识别身份时，还会根据本地 `browserAuth.organization` 配置点击登录并选择明确组织。密码、扫码、验证码和 CAPTCHA 始终留给人工处理。测试会自动授予页面本地网络访问权限，并把截图与结构化证据写入 `.cache/playwright/flowboard/`。
 
 Flowboard 的任务字段契约以 `contracts/flowboard-task.schema.json` 为唯一事实源。修改字段后运行 `npm run contract:generate`；`npm run check` 会通过 `contract:generated:check` 阻止过期的 TypeScript 类型和运行时解析器进入提交。
 

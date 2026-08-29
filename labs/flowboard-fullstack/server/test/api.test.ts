@@ -86,3 +86,33 @@ test('task CRUD validates input and persists state for the process lifetime', as
     assert.equal((await deletedResponse.json()).data.id, created.data.id);
   });
 });
+
+test('connector-compatible POST routes preserve PATCH and DELETE semantics', async () => {
+  await withServer(async (baseUrl) => {
+    const createdResponse = await fetch(`${baseUrl}/api/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: '连接器兼容任务',
+        description: '验证连接器只使用 GET 和 POST',
+        priority: 'medium',
+        assignee: '连接器测试',
+      }),
+    });
+    const created = await createdResponse.json();
+
+    const updatedResponse = await fetch(`${baseUrl}/api/tasks/${created.data.id}/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'done' }),
+    });
+    assert.equal(updatedResponse.status, 200);
+    assert.equal((await updatedResponse.json()).data.status, 'done');
+
+    const deletedResponse = await fetch(`${baseUrl}/api/tasks/${created.data.id}/delete`, {
+      method: 'POST',
+    });
+    assert.equal(deletedResponse.status, 200);
+    assert.equal((await deletedResponse.json()).data.id, created.data.id);
+  });
+});

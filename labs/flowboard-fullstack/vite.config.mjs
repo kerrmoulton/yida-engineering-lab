@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import {
   createLabRuntimeModule,
+  createConnectorIdMap,
   createPageRouteMap,
   createServiceUrlMap,
   loadManifest,
@@ -30,6 +31,8 @@ export default defineConfig(async () => {
   const runtimeSource = createLabRuntimeModule({
     routes: createPageRouteMap(manifest),
     services: createServiceUrlMap(manifest),
+    connectors: createConnectorIdMap(manifest),
+    profile: { stage: 'test', defaultTransport: 'direct', allowDirectOverride: true },
   });
 
   return {

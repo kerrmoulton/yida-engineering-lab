@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import test from 'node:test';
 import { assessLiveBaseline } from '../scripts/check-live-baseline.mjs';
 import {
+  createConnectorIdMap,
   createLabRuntimeModule,
   createPageRouteMap,
   digest,
@@ -10,6 +11,10 @@ import {
   findCanvasComponent,
   stableValue,
 } from '../scripts/lib.mjs';
+import {
+  createFlowboardConnectorActions,
+  validateFlowboardApiContract,
+} from '../scripts/generate-flowboard-connector-actions.mjs';
 import { createCanvasPublishSource, createCanvasRuntimeSource } from '../scripts/tailwind-build-lib.mjs';
 
 test('extractJsonDocuments ignores command banners and preserves nested JSON', () => {
@@ -77,11 +82,37 @@ test('local preview and Canvas builds can share one virtual runtime module', () 
   const source = createLabRuntimeModule({
     routes: { 'flowboard.board': '/APP_TEST/workbench/FORM_FLOWBOARD' },
     services: { flowboardApi: 'http://127.0.0.1:4318/api' },
+    connectors: { flowboardApi: 'Http_TEST' },
+    profile: { stage: 'test', defaultTransport: 'connector', allowDirectOverride: true },
   });
   assert.match(source, /getLabPageUrl/);
   assert.match(source, /getLabServiceUrl/);
   assert.match(source, /FORM_FLOWBOARD/);
   assert.match(source, /127\.0\.0\.1:4318/);
+  assert.match(source, /Http_TEST/);
+  assert.match(source, /allowDirectOverride/);
+});
+
+test('connector map requires explicit environment mapping for guarded builds', () => {
+  const manifest = { connectors: [{ key: 'flowboardApi', connectorId: null }] };
+  assert.deepEqual(createConnectorIdMap(manifest), {
+    flowboardApi: '#unconfigured-connector=flowboardApi',
+  });
+  assert.throws(() => createConnectorIdMap(manifest, { requireConfigured: true }), /connectorId/);
+});
+
+test('Flowboard API contract generates deterministic safe connector actions', async () => {
+  const contract = JSON.parse(
+    await fs.readFile(new URL('../contracts/flowboard-api.contract.json', import.meta.url), 'utf8'),
+  );
+  assert.deepEqual(validateFlowboardApiContract(contract), { operationCount: 5, actionCount: 5 });
+  const actions = createFlowboardConnectorActions(contract);
+  assert.deepEqual(
+    actions.map((action) => action.operationId),
+    ['health_get', 'tasks_list', 'tasks_create', 'tasks_update', 'tasks_remove'],
+  );
+  assert.equal(actions.find((action) => action.operationId === 'tasks_update').method, 'post');
+  assert.equal(actions.find((action) => action.operationId === 'tasks_remove').url, 'api/tasks/{id}/delete');
 });
 
 test('tracked Tailwind author source uses a normal CSS import', async () => {

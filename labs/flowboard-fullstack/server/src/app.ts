@@ -89,8 +89,8 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
     response.status(201).json({ success: true, data: task, meta: { requestId: request.requestId } });
   });
 
-  app.patch('/api/tasks/:id', (request, response) => {
-    const task = store.update(request.params.id, updateTaskSchema.parse(request.body));
+  function updateTask(request: Request, response: Response) {
+    const task = store.update(String(request.params.id), updateTaskSchema.parse(request.body));
     if (!task) {
       response.status(404).json({
         success: false,
@@ -100,10 +100,10 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
       return;
     }
     response.json({ success: true, data: task, meta: { requestId: request.requestId } });
-  });
+  }
 
-  app.delete('/api/tasks/:id', (request, response) => {
-    const task = store.remove(request.params.id);
+  function deleteTask(request: Request, response: Response) {
+    const task = store.remove(String(request.params.id));
     if (!task) {
       response.status(404).json({
         success: false,
@@ -113,7 +113,12 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
       return;
     }
     response.json({ success: true, data: task, meta: { requestId: request.requestId } });
-  });
+  }
+
+  app.patch('/api/tasks/:id', updateTask);
+  app.post('/api/tasks/:id/update', updateTask);
+  app.delete('/api/tasks/:id', deleteTask);
+  app.post('/api/tasks/:id/delete', deleteTask);
 
   app.use((error: unknown, request: Request, response: Response, _next: NextFunction) => {
     if (error && typeof error === 'object' && 'issues' in error && Array.isArray(error.issues)) {

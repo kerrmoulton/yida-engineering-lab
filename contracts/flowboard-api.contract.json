@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "prefix": "/api",
+  "operations": [
+    {
+      "key": "health.get",
+      "title": "查询 Flowboard API 健康状态",
+      "direct": { "method": "GET", "path": "/health" },
+      "connector": { "operationId": "health_get", "method": "GET", "path": "/api/health" },
+      "parameters": []
+    },
+    {
+      "key": "tasks.list",
+      "title": "查询任务列表",
+      "direct": { "method": "GET", "path": "/tasks" },
+      "connector": { "operationId": "tasks_list", "method": "GET", "path": "/api/tasks" },
+      "parameters": [
+        { "name": "search", "in": "query", "type": "String", "required": false },
+        { "name": "status", "in": "query", "type": "String", "required": false }
+      ]
+    },
+    {
+      "key": "tasks.create",
+      "title": "创建任务",
+      "direct": { "method": "POST", "path": "/tasks" },
+      "connector": { "operationId": "tasks_create", "method": "POST", "path": "/api/tasks" },
+      "parameters": [{ "name": "body", "in": "body", "type": "Object", "required": true }]
+    },
+    {
+      "key": "tasks.update",
+      "title": "更新任务",
+      "direct": { "method": "PATCH", "path": "/tasks/{id}" },
+      "connector": {
+        "operationId": "tasks_update",
+        "method": "POST",
+        "path": "/api/tasks/{id}/update"
+      },
+      "parameters": [
+        { "name": "id", "in": "path", "type": "String", "required": true },
+        { "name": "body", "in": "body", "type": "Object", "required": true }
+      ]
+    },
+    {
+      "key": "tasks.remove",
+      "title": "删除任务",
+      "direct": { "method": "DELETE", "path": "/tasks/{id}" },
+      "connector": {
+        "operationId": "tasks_remove",
+        "method": "POST",
+        "path": "/api/tasks/{id}/delete"
+      },
+      "parameters": [{ "name": "id", "in": "path", "type": "String", "required": true }]
+    }
+  ]
+}

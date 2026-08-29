@@ -18,6 +18,13 @@
       "baseUrl": "http://127.0.0.1:4318/api"
     }
   ],
+  "connectors": [
+    {
+      "key": "flowboardApi",
+      "name": "宜搭测试接口",
+      "connectorId": null
+    }
+  ],
   "pages": [
     {
       "key": "tailwind.runtime",

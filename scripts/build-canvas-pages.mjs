@@ -3,6 +3,7 @@ import path from 'node:path';
 import { build } from 'esbuild';
 import {
   createLabRuntimeModule,
+  createConnectorIdMap,
   createPageRouteMap,
   createServiceUrlMap,
   loadManifest,
@@ -16,6 +17,7 @@ const requireTargets = process.argv.includes('--require-targets');
 const manifest = await loadManifest();
 const routes = createPageRouteMap(manifest, { requireRemote: requireTargets });
 const services = createServiceUrlMap(manifest, { requireConfigured: requireTargets });
+const connectors = createConnectorIdMap(manifest, { requireConfigured: requireTargets });
 const tailwindPages = manifest.pages.filter((page) => page.build?.kind === 'tailwind');
 let css = null;
 
@@ -59,7 +61,12 @@ for (const page of manifest.pages) {
     output = createCanvasRuntimeSource(authorSource, routes);
   } else if (page.build?.kind === 'esbuild-canvas') {
     const contract = await readJson(page.contract);
-    const runtimeModule = createLabRuntimeModule({ routes, services });
+    const runtimeModule = createLabRuntimeModule({
+      routes,
+      services,
+      connectors,
+      profile: { stage: 'test', defaultTransport: 'connector', allowDirectOverride: true },
+    });
     const result = await build({
       entryPoints: [authorSourcePath],
       bundle: true,
@@ -118,6 +125,7 @@ console.log(
       success: true,
       routes,
       services,
+      connectors,
       cssBytes: css ? Buffer.byteLength(css) : 0,
       outputs,
     },

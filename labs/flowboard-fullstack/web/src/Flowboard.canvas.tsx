@@ -2,7 +2,17 @@ import React from 'react';
 import { Alert, Button, ConfigProvider, Input, Modal, Select, Spin } from 'antd';
 import { Activity, Plus, RefreshCw, Search } from 'lucide-react';
 import type { CreateTaskInput, Health, Task, TaskPriority, TaskStatus } from '../../shared/task-contract.ts';
-import { API_BASE_URL, createTask, deleteTask, fetchHealth, fetchTasks, updateTask } from './api/client.ts';
+import {
+  API_ENDPOINT_LABEL,
+  API_TRANSPORT,
+  CAN_RESET_TRANSPORT,
+  createTask,
+  deleteTask,
+  fetchHealth,
+  fetchTasks,
+  resetTransportOverride,
+  updateTask,
+} from './api/client.ts';
 import { BoardColumn } from './components/BoardColumn.tsx';
 import { FLOWBOARD_CSS } from './styles.ts';
 
@@ -189,12 +199,23 @@ function YidaComp() {
             <div>
               <span className="flow-eyebrow">Full-stack engineering lab</span>
               <h1>Flowboard</h1>
-              <p>用真实本地 API 验证 Canvas、多文件构建、共享契约与可观察请求链路。</p>
+              <p>用统一 API 契约验证 Canvas、Direct 与宜搭连接器双通道和可观察请求链路。</p>
             </div>
             <div className={`flow-health ${health ? 'is-online' : ''}`}>
               <span className="flow-health-dot" />
               <Activity size={16} />
-              {health ? '本地 API 在线' : '等待本地 API'}
+              {health
+                ? API_TRANSPORT === 'direct'
+                  ? '本地 API 在线'
+                  : '测试连接器在线'
+                : API_TRANSPORT === 'direct'
+                  ? '等待本地 API'
+                  : '等待测试连接器'}
+              {CAN_RESET_TRANSPORT ? (
+                <Button size="small" onClick={resetTransportOverride}>
+                  恢复测试连接器
+                </Button>
+              ) : null}
             </div>
           </header>
 
@@ -282,7 +303,7 @@ function YidaComp() {
           </section>
 
           <div className="flow-layout">
-            <Spin spinning={loading} tip="正在读取本地 API">
+            <Spin spinning={loading} tip="正在读取 Flowboard API">
               <section className="flow-board" aria-label="任务看板">
                 {COLUMNS.map((column) => (
                   <BoardColumn
@@ -324,10 +345,10 @@ function YidaComp() {
               </section>
               <section className="flow-panel flow-diagnostic">
                 <h2>联调诊断</h2>
-                <code>endpoint: {API_BASE_URL}</code>
+                <code>endpoint: {API_ENDPOINT_LABEL}</code>
                 <code>contract: typed/shared-runtime</code>
                 <code>requestId: {requestId}</code>
-                <code>transport: browser to localhost</code>
+                <code>transport: {API_TRANSPORT}</code>
               </section>
             </aside>
           </div>

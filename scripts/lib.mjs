@@ -49,6 +49,10 @@ export async function loadManifest() {
       ...service,
       baseUrl: localTargets.services?.[service.key]?.baseUrl || service.baseUrl,
     }));
+    manifest.connectors = (manifest.connectors || []).map((connector) => ({
+      ...connector,
+      connectorId: localTargets.connectors?.[connector.key]?.connectorId || connector.connectorId,
+    }));
   }
 
   for (const page of manifest.pages) {
@@ -58,6 +62,25 @@ export async function loadManifest() {
     }
   }
   return manifest;
+}
+
+export function createConnectorIdMap(manifest, { requireConfigured = false } = {}) {
+  const connectors = manifest.connectors || [];
+  const keys = connectors.map((connector) => connector.key);
+  if (keys.some((key) => !key) || new Set(keys).size !== keys.length) {
+    throw new Error('manifest.json 中每个连接器必须有唯一 key');
+  }
+  return Object.fromEntries(
+    connectors.map((connector) => {
+      if (requireConfigured && !connector.connectorId) {
+        throw new Error(`连接器 ${connector.key} 缺少 connectorId 映射`);
+      }
+      return [
+        connector.key,
+        connector.connectorId || `#unconfigured-connector=${encodeURIComponent(connector.key)}`,
+      ];
+    }),
+  );
 }
 
 export function createServiceUrlMap(manifest, { requireConfigured = false } = {}) {
@@ -92,10 +115,12 @@ export function createPageRouteMap(manifest, { requireRemote = false } = {}) {
   );
 }
 
-export function createLabRuntimeModule({ routes, services }) {
+export function createLabRuntimeModule({ routes, services, connectors = {}, profile = {} }) {
   return `
 const PAGE_ROUTES = ${JSON.stringify(routes)};
 const SERVICE_URLS = ${JSON.stringify(services)};
+const CONNECTOR_IDS = ${JSON.stringify(connectors)};
+const RUNTIME_PROFILE = ${JSON.stringify(profile)};
 export function getLabPageUrl(key) {
   const value = PAGE_ROUTES[key];
   if (!value) throw new Error('Unknown Yida Lab page key: ' + key);
@@ -105,6 +130,14 @@ export function getLabServiceUrl(key) {
   const value = SERVICE_URLS[key];
   if (!value) throw new Error('Unknown Yida Lab service key: ' + key);
   return value;
+}
+export function getLabConnectorId(key) {
+  const value = CONNECTOR_IDS[key];
+  if (!value) throw new Error('Unknown Yida Lab connector key: ' + key);
+  return value;
+}
+export function getLabRuntimeProfile() {
+  return { ...RUNTIME_PROFILE };
 }
 `;
 }

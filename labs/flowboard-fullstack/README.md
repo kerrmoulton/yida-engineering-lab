@@ -1,6 +1,6 @@
 # Flowboard Full-stack Lab
 
-该实验验证宜搭 Code Canvas 能否采用接近常规前后端项目的开发方式：前端保持多文件组件结构，通过 esbuild 生成单文件 Canvas 产物；后端使用 TypeScript + Express；浏览器经用户授权后直接访问仅监听本机的 API；前后端共享可执行的 TypeScript 数据契约。
+该实验验证宜搭 Code Canvas 能否采用接近常规前后端项目的开发方式：前端保持多文件组件结构，通过 esbuild 生成单文件 Canvas 产物；后端使用 TypeScript + Express；同一页面可在 localhost Direct 与宜搭测试连接器之间切换；前后端共享可执行的 TypeScript 数据契约。
 
 ## 目录
 
@@ -42,8 +42,13 @@ npm run build:canvas
 npm run contract:check
 npx playwright install chromium
 npm run test:flowboard:e2e
-npm run test:flowboard:remote
+npm run test:flowboard:remote:direct
+npm run test:flowboard:remote:connector
 ```
+
+Vite 本地预览默认使用 Direct。发布到宜搭测试应用的 Canvas 默认使用连接器；访问页面时加 `?transport=direct` 会把当前标签页切到 localhost 并写入 `sessionStorage`，后续同标签页导航继续沿用。加 `?transport=connector` 或点击“恢复测试连接器”会清除覆盖。构建时连接器 ID 从被 Git 忽略的目标配置注入，不在作者源码中写死。
+
+`contracts/flowboard-api.contract.json` 同时描述 Direct 路由和连接器动作。`npm run connector:flowboard:generate` 从契约生成被忽略的动作文件，`npm run connector:flowboard:check` 在 CI 中检查映射完整性。临时公网验证可先启动本地 API，再运行 `npm run tunnel:flowboard`；quick tunnel 地址会变化，仅用于实验，不作为生产部署方案。
 
 配置好被 Git 忽略的 `config/targets.local.json` 后，可发布和回读独立逻辑页面，不会覆盖其他实验：
 
@@ -66,7 +71,8 @@ npm run verify:flowboard
 - Express 源码变化触发 `tsx watch` 平滑终止并重启本地服务。
 - 组件测试覆盖 API 读取、任务创建和契约错误可视化反馈。
 - Playwright 自动完成真实浏览器新建、两次状态推进、删除、搜索和失败清理。
-- 远程只读冒烟测试复用专用 Chrome profile，自动检查真实 Canvas 首屏和 localhost API。
+- 远程只读冒烟测试复用专用 Chrome profile，并分别检查真实 Canvas 的 Direct 与连接器通道。
+- 已登录身份下可按本地组织配置自动点击统一认证登录和选择组织；强认证步骤保持人工处理。
 - SQLite 自动化测试验证进程式重开后的持久化，以及 reset/seed 的确定性。
 - JSON Schema 自动生成前后端类型和轻量运行时解析器，CI 检查生成结果是否过期。
 - Vite 预览把业务入口、React 核心和 UI 依赖拆分缓存；Canvas 发布文件保持不变。
