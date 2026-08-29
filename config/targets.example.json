@@ -1,0 +1,12 @@
+{
+  "applicationName": "My Yida Test Application",
+  "appType": "APP_REPLACE_WITH_YOUR_TEST_APP",
+  "pages": {
+    "tailwind.runtime": {
+      "formUuid": "FORM-REPLACE-WITH-RUNTIME-PAGE"
+    },
+    "tailwind.buildTime": {
+      "formUuid": "FORM-REPLACE-WITH-BUILD-TIME-PAGE"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "application": {
+    "key": "engineeringLab",
+    "name": "Yida Engineering Lab",
+    "appType": null,
+    "environment": "test"
+  },
+  "sourcePolicy": {
+    "canvas": "GIT_MANAGED",
+    "remoteWrite": "GUARDED",
+    "verification": "TOKEN_SCHEMA_READBACK"
+  },
+  "pages": [
+    {
+      "key": "tailwind.runtime",
+      "name": "Tailwind 路径 A · 运行时导入",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/canvas-tailwind/src/TailwindRuntimeImportProbe.canvas.jsx",
+      "source": "labs/canvas-tailwind/dist/TailwindRuntimeImportProbe.canvas.jsx",
+      "build": {
+        "kind": "canvas"
+      },
+      "contract": "contracts/canvas-runtime-experiment.contract.json",
+      "baseline": "release/baselines/tailwind.runtime.test.json"
+    },
+    {
+      "key": "tailwind.buildTime",
+      "name": "Tailwind 路径 B · 本地编译",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/canvas-tailwind/src/TailwindBuildTimeProbe.canvas.jsx",
+      "source": "labs/canvas-tailwind/dist/TailwindBuildTimeProbe.canvas.jsx",
+      "build": {
+        "kind": "tailwind",
+        "styleEntry": "labs/canvas-tailwind/src/styles.css",
+        "config": "labs/canvas-tailwind/tailwind.config.cjs"
+      },
+      "contract": "contracts/canvas-page.contract.json",
+      "baseline": "release/baselines/tailwind.buildTime.test.json"
+    }
+  ]
+}

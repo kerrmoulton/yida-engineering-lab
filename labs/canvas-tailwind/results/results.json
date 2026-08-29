@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "runtimeImport": {
+    "pageKey": "tailwind.runtime",
+    "publishedVersion": 1,
+    "source": "labs/canvas-tailwind/src/TailwindRuntimeImportProbe.canvas.jsx",
+    "utilitiesApplied": true,
+    "computedStyle": {
+      "backgroundColor": "oklch(0.637 0.237 25.331)",
+      "paddingTop": "32px",
+      "display": "grid",
+      "borderRadius": "12px"
+    },
+    "dependencyMapError": "tailwindcss is not found in dependencies map",
+    "runtimeWarning": "Tailwind browser build should not be used in production",
+    "interpretation": "The visual result works through the platform Tailwind browser runtime, but tailwindcss is not a normal Canvas dependency."
+  },
+  "buildTime": {
+    "pageKey": "tailwind.buildTime",
+    "publishedVersion": 8,
+    "authorSource": "labs/canvas-tailwind/src/TailwindBuildTimeProbe.canvas.jsx",
+    "generatedArtifact": "labs/canvas-tailwind/dist/TailwindBuildTimeProbe.canvas.jsx",
+    "tailwindVersion": "3.4.17",
+    "prefix": "lab-",
+    "generatedCssBytes": 2503,
+    "probeStatus": "passed",
+    "computedStyle": {
+      "backgroundColor": "rgb(124, 58, 237)",
+      "paddingTop": "32px",
+      "display": "grid",
+      "borderRadius": "14px",
+      "color": "rgb(255, 255, 255)"
+    },
+    "dependencyMapErrors": [],
+    "authoringBoundary": "Author source imports ./styles.css; generated CSS exists only in the ignored publish artifact.",
+    "interpretation": "Prefixed utilities and a custom color token prove that the locally compiled CSS is active independently of the platform runtime."
+  },
+  "liveRoutes": ["tailwind.runtime", "tailwind.buildTime"],
+  "navigation": "Source uses logical page keys; build output injects environment-specific routes."
+}

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "pageKey": "example.page",
+  "pageName": "Example page",
+  "environment": "test",
+  "capturedAt": "2026-01-01T00:00:00.000Z",
+  "appType": "APP_EXAMPLE",
+  "formUuid": "FORM-EXAMPLE",
+  "source": "labs/example/dist/Example.canvas.jsx",
+  "sourceSha256": "example",
+  "liveSemanticSha256": "example",
+  "runtimeCodeSha256": "example",
+  "runtimeCodeBytes": 0,
+  "publishEvidence": {
+    "publishMode": "canvas",
+    "healthCheckOk": true,
+    "hasYidaCodeCanvas": true,
+    "publishedContentMatched": true
+  }
+}
