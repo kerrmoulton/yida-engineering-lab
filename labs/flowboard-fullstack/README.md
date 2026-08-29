@@ -1,0 +1,50 @@
+# Flowboard Full-stack Lab
+
+该实验验证宜搭 Code Canvas 能否采用接近常规前后端项目的开发方式：前端保持多文件组件结构，通过 esbuild 生成单文件 Canvas 产物；后端使用 TypeScript + Express；浏览器经用户授权后直接访问仅监听本机的 API；前后端共享可执行的 TypeScript 数据契约。
+
+## 目录
+
+- `web/src/`：Canvas 页面、组件、样式与 API 客户端。
+- `server/src/`：Express 应用、内存任务仓库与启动入口。
+- `server/test/`：HTTP、CORS/PNA、校验与 CRUD 集成测试。
+- `shared/`：前后端共同使用的任务类型与运行时解析器。
+- `dist/`：构建产物，由命令生成且不进入 Git。
+- `prd.md`、`design.md`：实验需求和页面设计约束。
+- `results/results.json`：不含真实应用 ID 的结构化验收记录。
+
+## 本地开发与验证
+
+```bash
+npm install
+npm run dev:flowboard:api
+```
+
+API 地址为 `http://127.0.0.1:4318/api`。首次从 HTTPS 宜搭页面调用本地 API 时，浏览器可能询问是否允许该站点访问本地网络；允许后刷新页面即可继续。服务使用内存数据，重启会恢复三条种子任务。
+
+另开终端运行确定性检查：
+
+```bash
+npm run typecheck:flowboard
+npm run test:flowboard
+npm run build:canvas
+npm run contract:check
+```
+
+配置好被 Git 忽略的 `config/targets.local.json` 后，可发布和回读独立逻辑页面，不会覆盖其他实验：
+
+```bash
+npm run guard:flowboard
+npm run publish:flowboard
+npm run verify:flowboard
+```
+
+## 已验证链路
+
+- Canvas 页面读取 API 健康状态和任务列表。
+- 页面新建任务，并将任务从待处理推进到进行中、已完成。
+- 受控确认对话框删除任务，服务端收到 `DELETE` 并返回成功。
+- 标题、说明和负责人搜索由 API 查询参数驱动。
+- 页面展示最近请求 ID，服务端结构化日志记录同一个 `X-Request-Id`。
+- CORS 和 Private Network Access 预检通过，API 仅监听回环地址。
+
+实验中发现 Canvas 运行时内的浮层确认组件回调并不稳定，因此删除交互改为页面级受控 `Modal`。这项兼容性结论已固化在源码和浏览器回归结果中。

@@ -7,6 +7,14 @@
     },
     "tailwind.buildTime": {
       "formUuid": "FORM-REPLACE-WITH-BUILD-TIME-PAGE"
+    },
+    "flowboard.board": {
+      "formUuid": "FORM-REPLACE-WITH-FLOWBOARD-PAGE"
+    }
+  },
+  "services": {
+    "flowboardApi": {
+      "baseUrl": "http://127.0.0.1:4318/api"
     }
   }
 }

@@ -11,6 +11,13 @@
     "remoteWrite": "GUARDED",
     "verification": "TOKEN_SCHEMA_READBACK"
   },
+  "services": [
+    {
+      "key": "flowboardApi",
+      "name": "Flowboard local API",
+      "baseUrl": "http://127.0.0.1:4318/api"
+    }
+  ],
   "pages": [
     {
       "key": "tailwind.runtime",
@@ -41,6 +48,20 @@
       },
       "contract": "contracts/canvas-page.contract.json",
       "baseline": "release/baselines/tailwind.buildTime.test.json"
+    },
+    {
+      "key": "flowboard.board",
+      "name": "Flowboard · 全栈联调实验",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/flowboard-fullstack/web/src/Flowboard.canvas.jsx",
+      "source": "labs/flowboard-fullstack/dist/Flowboard.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/flowboard-canvas.contract.json",
+      "baseline": "release/baselines/flowboard.board.test.json"
     }
   ]
 }

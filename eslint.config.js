@@ -5,11 +5,18 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['node_modules/**', '.cache/**', 'project/.cache/**', 'project/pages/dist/**', 'release/**'],
+    ignores: [
+      'node_modules/**',
+      '.cache/**',
+      'project/.cache/**',
+      'project/pages/dist/**',
+      'labs/*/dist/**',
+      'release/**',
+    ],
   },
   js.configs.recommended,
   {
-    files: ['project/pages/src/**/*.{js,jsx,mjs}', 'scripts/**/*.mjs', 'tests/**/*.mjs'],
+    files: ['labs/**/*.{js,jsx,mjs}', 'scripts/**/*.mjs', 'tests/**/*.mjs'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -27,6 +34,7 @@ export default [
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      'react/jsx-uses-react': 'error',
       'react/jsx-uses-vars': 'error',
       'no-empty': ['error', { allowEmptyCatch: true }],
       'no-unused-vars': [

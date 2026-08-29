@@ -12,7 +12,7 @@ Yida Engineering Lab 是面向宜搭 Code Canvas 的可复用工程能力实验�
 - `tests/`：不访问真实环境的工具单元测试。
 - `release/`：本机生成的远端基线；真实基线不会进入 Git。
 
-当前已完成的实验见 [Canvas Tailwind Lab](labs/canvas-tailwind/README.md)。完整目录演进规则见 [仓库架构](docs/architecture.md)。
+当前已完成的实验包括 [Canvas Tailwind Lab](labs/canvas-tailwind/README.md) 和 [Flowboard Full-stack Lab](labs/flowboard-fullstack/README.md)。完整目录演进规则见 [仓库架构](docs/architecture.md)。
 
 ## 本地配置
 
@@ -32,10 +32,13 @@ cp config/targets.example.json config/targets.local.json
 npm install
 npm run check
 npm run build:canvas
+npm run dev:flowboard:api
 npm run guard:live -- --page tailwind.runtime
 npm run publish:test -- --page tailwind.runtime
 npm run verify:remote -- --page tailwind.runtime
 ```
+
+Flowboard 联调时先启动本地 API，再打开已发布的 Canvas 页面，并在浏览器首次提示时允许该宜搭域名访问本地网络。服务只监听 `127.0.0.1:4318`，重启后内存数据会恢复为种子任务。
 
 本地检查会遍历 manifest 中的全部页面；守卫、发布和远端回读必须用 `--page` 明确指定一个逻辑页面，避免误覆盖。发布会先检查线上漂移，再执行 Canvas 发布和健康检查，最后为该页面单独更新本机基线。检测到线上内容偏离基线时会停止，不自动覆盖远端。
 

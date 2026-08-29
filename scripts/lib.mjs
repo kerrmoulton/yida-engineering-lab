@@ -44,6 +44,10 @@ export async function loadManifest() {
       ...page,
       formUuid: localTargets.pages?.[page.key]?.formUuid || page.formUuid,
     }));
+    manifest.services = (manifest.services || []).map((service) => ({
+      ...service,
+      baseUrl: localTargets.services?.[service.key]?.baseUrl || service.baseUrl,
+    }));
   }
 
   for (const page of manifest.pages) {
@@ -53,6 +57,22 @@ export async function loadManifest() {
     }
   }
   return manifest;
+}
+
+export function createServiceUrlMap(manifest, { requireConfigured = false } = {}) {
+  const services = manifest.services || [];
+  const keys = services.map((service) => service.key);
+  if (keys.some((key) => !key) || new Set(keys).size !== keys.length) {
+    throw new Error('manifest.json 中每个服务必须有唯一 key');
+  }
+  return Object.fromEntries(
+    services.map((service) => {
+      if (requireConfigured && !service.baseUrl) {
+        throw new Error(`服务 ${service.key} 缺少 baseUrl 映射`);
+      }
+      return [service.key, service.baseUrl || `#unconfigured-service=${encodeURIComponent(service.key)}`];
+    }),
+  );
 }
 
 export function createPageRouteMap(manifest, { requireRemote = false } = {}) {

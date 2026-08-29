@@ -13,9 +13,10 @@ for (const page of manifest.pages) {
     throw new Error(`${page.key}: 源码扩展名必须是 ${contract.sourceExtension}`);
   }
 
-  const imports = [...source.matchAll(/(?:import|export)\s+(?:[^'";]+?\s+from\s+)?['"]([^'"]+)['"]/g)].map(
-    (match) => match[1],
-  );
+  const imports = [
+    ...source.matchAll(/(?:^|;)\s*import\s*(?:[^'";]*?\bfrom\s*)?['"]([^'"]+)['"]/gm),
+    ...source.matchAll(/(?:^|;)\s*export\s+[^'";]*?\bfrom\s*['"]([^'"]+)['"]/gm),
+  ].map((match) => match[1]);
   const unknownImports = [...new Set(imports.filter((name) => !contract.allowedImports.includes(name)))];
   if (unknownImports.length) {
     throw new Error(`${page.key}: 发现未列入 Canvas 白名单的依赖：${unknownImports.join(', ')}`);

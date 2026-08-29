@@ -1,0 +1,30 @@
+{
+  "experiment": "flowboard-fullstack",
+  "pageKey": "flowboard.board",
+  "verifiedAt": "2026-08-29",
+  "environment": "test",
+  "browser": {
+    "privateNetworkPermission": "allowed",
+    "apiStatus": "online"
+  },
+  "checks": {
+    "read": "passed",
+    "create": "passed",
+    "update": "passed",
+    "delete": "passed",
+    "search": "passed",
+    "requestIdCorrelation": "passed",
+    "corsAndPrivateNetworkPreflight": "passed"
+  },
+  "compatibilityFindings": [
+    {
+      "component": "Popconfirm",
+      "result": "callback-not-reliable-in-canvas-runtime",
+      "resolution": "controlled-modal"
+    }
+  ],
+  "notes": [
+    "Real app and form identifiers remain in ignored local configuration only.",
+    "The API uses an in-memory store and resets when the server restarts."
+  ]
+}
