@@ -1,8 +1,21 @@
 import React from 'react';
 import { Empty } from 'antd';
-import { TaskCard } from './TaskCard.jsx';
+import type { Task, TaskStatus } from '../../../shared/task-contract.ts';
+import { TaskCard } from './TaskCard.tsx';
 
-export function BoardColumn({ definition, tasks, selectedId, busyTaskId, actions }) {
+interface BoardColumnProps {
+  definition: { key: TaskStatus; label: string };
+  tasks: Task[];
+  selectedId: string | null;
+  busyTaskId: string | null;
+  actions: {
+    select: (id: string) => void;
+    move: (id: string, status: TaskStatus) => void;
+    remove: (id: string) => void;
+  };
+}
+
+export function BoardColumn({ definition, tasks, selectedId, busyTaskId, actions }: BoardColumnProps) {
   return (
     <section className="flow-column" data-status={definition.key}>
       <header className="flow-column-heading">

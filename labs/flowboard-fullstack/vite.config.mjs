@@ -51,8 +51,8 @@ export default defineConfig(async () => {
     },
     test: {
       environment: 'jsdom',
-      setupFiles: [path.join(WEB_ROOT, 'test/setup.js')],
-      include: [path.join(WEB_ROOT, 'test/**/*.test.{js,jsx}')],
+      setupFiles: [path.join(WEB_ROOT, 'test/setup.ts')],
+      include: [path.join(WEB_ROOT, 'test/**/*.test.{ts,tsx}')],
       restoreMocks: true,
       clearMocks: true,
     },

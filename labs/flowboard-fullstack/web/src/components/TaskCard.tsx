@@ -1,12 +1,22 @@
 import React from 'react';
 import { Button, Tag, Tooltip } from 'antd';
 import { ArrowLeft, ArrowRight, Trash2, UserRound } from 'lucide-react';
+import type { Task, TaskStatus } from '../../../shared/task-contract.ts';
 
-const PRIORITY_LABELS = { low: '低', medium: '中', high: '高' };
-const PRIORITY_COLORS = { low: 'default', medium: 'gold', high: 'red' };
-const STATUS_ORDER = ['backlog', 'in_progress', 'done'];
+const PRIORITY_LABELS = { low: '低', medium: '中', high: '高' } as const;
+const PRIORITY_COLORS = { low: 'default', medium: 'gold', high: 'red' } as const;
+const STATUS_ORDER: TaskStatus[] = ['backlog', 'in_progress', 'done'];
 
-export function TaskCard({ task, selected, busy, onSelect, onMove, onDelete }) {
+interface TaskCardProps {
+  task: Task;
+  selected: boolean;
+  busy: boolean;
+  onSelect: (id: string) => void;
+  onMove: (id: string, status: TaskStatus) => void;
+  onDelete: (id: string) => void;
+}
+
+export function TaskCard({ task, selected, busy, onSelect, onMove, onDelete }: TaskCardProps) {
   const statusIndex = STATUS_ORDER.indexOf(task.status);
   return (
     <article

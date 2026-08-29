@@ -55,7 +55,7 @@
       "formUuid": null,
       "formType": "display",
       "managementMode": "GIT_MANAGED",
-      "authorSource": "labs/flowboard-fullstack/web/src/Flowboard.canvas.jsx",
+      "authorSource": "labs/flowboard-fullstack/web/src/Flowboard.canvas.tsx",
       "source": "labs/flowboard-fullstack/dist/Flowboard.canvas.jsx",
       "build": {
         "kind": "esbuild-canvas"

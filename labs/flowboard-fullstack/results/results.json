@@ -15,8 +15,13 @@
     "search": "passed",
     "viteLocalPreview": "passed",
     "hotModuleReplacementWithStatePreservation": "passed",
+    "strictTsxTypecheck": "passed",
+    "expressWatchRestart": "passed",
     "frontendComponentTests": "passed",
+    "playwrightLocalE2E": "passed",
     "visibleContractErrorFeedback": "passed",
+    "remoteTsxBuildReadback": "passed",
+    "remoteCanvasRuntimeSmoke": "passed",
     "requestIdCorrelation": "passed",
     "corsAndPrivateNetworkPreflight": "passed"
   },

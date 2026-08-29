@@ -1,16 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Flowboard from '../src/Flowboard.canvas.jsx';
-import { PreviewStatus } from './PreviewStatus.jsx';
+import Flowboard from '../src/Flowboard.canvas.tsx';
+import { PreviewStatus } from './PreviewStatus.tsx';
 import './shell.css';
 
-class PreviewErrorBoundary extends React.Component {
-  constructor(props) {
+interface PreviewErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface PreviewErrorBoundaryState {
+  error: Error | null;
+}
+
+class PreviewErrorBoundary extends React.Component<PreviewErrorBoundaryProps, PreviewErrorBoundaryState> {
+  constructor(props: PreviewErrorBoundaryProps) {
     super(props);
     this.state = { error: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): PreviewErrorBoundaryState {
     return { error };
   }
 
@@ -27,7 +35,10 @@ class PreviewErrorBoundary extends React.Component {
   }
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Missing #root preview mount point');
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <div className="preview-shell">
       <PreviewStatus />

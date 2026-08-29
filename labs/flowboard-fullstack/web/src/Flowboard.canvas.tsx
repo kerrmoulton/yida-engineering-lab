@@ -1,17 +1,28 @@
 import React from 'react';
 import { Alert, Button, ConfigProvider, Input, Modal, Select, Spin } from 'antd';
 import { Activity, Plus, RefreshCw, Search } from 'lucide-react';
-import { API_BASE_URL, createTask, deleteTask, fetchHealth, fetchTasks, updateTask } from './api/client.js';
-import { BoardColumn } from './components/BoardColumn.jsx';
-import { FLOWBOARD_CSS } from './styles.js';
+import type { CreateTaskInput, Health, Task, TaskPriority, TaskStatus } from '../../shared/task-contract.ts';
+import { API_BASE_URL, createTask, deleteTask, fetchHealth, fetchTasks, updateTask } from './api/client.ts';
+import { BoardColumn } from './components/BoardColumn.tsx';
+import { FLOWBOARD_CSS } from './styles.ts';
 
-const COLUMNS = [
+const COLUMNS: Array<{ key: TaskStatus; label: string }> = [
   { key: 'backlog', label: '待处理' },
   { key: 'in_progress', label: '进行中' },
   { key: 'done', label: '已完成' },
 ];
 
-function readBrandColor(level, defaultColor) {
+interface DisplayError extends Error {
+  issues?: unknown[];
+}
+
+interface TaskDraft {
+  title: string;
+  assignee: string;
+  priority: TaskPriority;
+}
+
+function readBrandColor(level: number, defaultColor: string) {
   try {
     const value = getComputedStyle(document.documentElement)
       .getPropertyValue(`--color-brand1-${level || 6}`)
@@ -22,33 +33,39 @@ function readBrandColor(level, defaultColor) {
   }
 }
 
-function describeError(error) {
-  if (error?.name === 'AbortError') return null;
-  if (error?.issues) return 'API 响应没有通过共享契约校验。';
+function describeError(error: unknown): string | null {
+  if (error instanceof Error && error.name === 'AbortError') return null;
+  if (error instanceof Error && Array.isArray((error as DisplayError).issues)) {
+    return 'API 响应没有通过共享契约校验。';
+  }
   if (error instanceof TypeError) {
     return '无法访问本地 API。请确认服务已启动，并允许浏览器访问本地网络。';
   }
-  return error?.message || '请求失败，请稍后重试。';
+  return error instanceof Error ? error.message : '请求失败，请稍后重试。';
 }
 
 function YidaComp() {
-  const [tasks, setTasks] = React.useState([]);
-  const [health, setHealth] = React.useState(null);
+  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [health, setHealth] = React.useState<Health | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  const [error, setError] = React.useState<string | null>(null);
   const [requestId, setRequestId] = React.useState('尚未请求');
   const [search, setSearch] = React.useState('');
-  const [status, setStatus] = React.useState('all');
-  const [selectedId, setSelectedId] = React.useState(null);
-  const [busyTaskId, setBusyTaskId] = React.useState(null);
-  const [deleteCandidateId, setDeleteCandidateId] = React.useState(null);
+  const [status, setStatus] = React.useState<'all' | TaskStatus>('all');
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [busyTaskId, setBusyTaskId] = React.useState<string | null>(null);
+  const [deleteCandidateId, setDeleteCandidateId] = React.useState<string | null>(null);
   const [deleting, setDeleting] = React.useState(false);
   const [creating, setCreating] = React.useState(false);
-  const [draft, setDraft] = React.useState({ title: '', assignee: '', priority: 'medium' });
+  const [draft, setDraft] = React.useState<TaskDraft>({
+    title: '',
+    assignee: '',
+    priority: 'medium',
+  });
   const brand = readBrandColor(6, '#5b6fc7');
 
   const load = React.useCallback(
-    (signal) => {
+    (signal?: AbortSignal) => {
       setLoading(true);
       setError(null);
       return Promise.all([fetchTasks({ search, status }, signal), fetchHealth(signal)])
@@ -86,7 +103,7 @@ function YidaComp() {
   }, [load]);
 
   const mutate = React.useCallback(
-    async (taskId, operation) => {
+    async (taskId: string, operation: () => Promise<{ requestId: string }>) => {
       setBusyTaskId(taskId);
       setError(null);
       try {
@@ -107,12 +124,13 @@ function YidaComp() {
     setCreating(true);
     setError(null);
     try {
-      const result = await createTask({
+      const input: CreateTaskInput = {
         title: draft.title,
         description: '通过 Flowboard Canvas 页面创建。',
         priority: draft.priority,
         assignee: draft.assignee,
-      });
+      };
+      const result = await createTask(input);
       setRequestId(result.requestId);
       setDraft({ title: '', assignee: '', priority: 'medium' });
       setSelectedId(result.data.data.id);
@@ -124,11 +142,11 @@ function YidaComp() {
     }
   }, [creating, draft, reload]);
 
-  const groupedTasks = React.useMemo(
+  const groupedTasks = React.useMemo<Record<TaskStatus, Task[]>>(
     () =>
       Object.fromEntries(
         COLUMNS.map((column) => [column.key, tasks.filter((task) => task.status === column.key)]),
-      ),
+      ) as Record<TaskStatus, Task[]>,
     [tasks],
   );
   const selectedTask = tasks.find((task) => task.id === selectedId) || null;
@@ -153,7 +171,7 @@ function YidaComp() {
   const actions = React.useMemo(
     () => ({
       select: setSelectedId,
-      move: (id, nextStatus) => mutate(id, () => updateTask(id, { status: nextStatus })),
+      move: (id: string, nextStatus: TaskStatus) => mutate(id, () => updateTask(id, { status: nextStatus })),
       remove: setDeleteCandidateId,
     }),
     [mutate],

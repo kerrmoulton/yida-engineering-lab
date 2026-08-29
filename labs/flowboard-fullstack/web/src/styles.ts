@@ -1,4 +1,4 @@
-export const FLOWBOARD_CSS = `
+export const FLOWBOARD_CSS: string = `
 .flow-root {
   --flow-brand: var(--color-brand1-6, #5b6fc7);
   --flow-brand-soft: var(--color-brand1-1, #eef1ff);

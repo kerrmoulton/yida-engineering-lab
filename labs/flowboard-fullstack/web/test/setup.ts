@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: (query) => ({
+  value: (query: string) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -17,10 +17,10 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 class ResizeObserverStub {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
 }
 
 globalThis.ResizeObserver = ResizeObserverStub;
-globalThis.HTMLElement.prototype.scrollIntoView = function scrollIntoView() {};
+globalThis.HTMLElement.prototype.scrollIntoView = function scrollIntoView(): void {};

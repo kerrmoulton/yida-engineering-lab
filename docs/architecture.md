@@ -26,9 +26,9 @@
 
 ## Local preview boundary
 
-需要本地交互开发的 Lab 可以提供薄 Vite 壳层，但壳层只负责挂载、开发错误边界和运行时适配，不复制业务页面。Vite 与 Canvas 发布构建共同使用 `scripts/lib.mjs` 生成 `@yida-lab/runtime`，因此页面路由和服务地址的逻辑键保持一致。
+需要本地交互开发的 Lab 可以提供薄 Vite 壳层，但壳层只负责挂载、开发错误边界和运行时适配，不复制业务页面。作者源码优先使用严格 TSX，构建后再形成 Canvas 单文件 JSX 发布边界。Vite 与 Canvas 发布构建共同使用 `scripts/lib.mjs` 生成 `@yida-lab/runtime`，因此页面路由和服务地址的逻辑键保持一致。
 
-本地预览用于 HMR、组件测试和快速错误反馈；真实宜搭页面继续用于验证平台依赖装配、Canvas 浮层行为、主题变量和浏览器本地网络授权。两层验证互补，不能用本地预览结果替代远端发布回归。
+本地预览用于 HMR、组件测试、Playwright E2E 和快速错误反馈；API 开发服务使用 watch 自动重启。真实宜搭页面继续用于验证平台依赖装配、Canvas 浮层行为、主题变量和浏览器本地网络授权。两层验证互补，不能用本地预览结果替代远端发布回归。
 
 ## Application and page identity
 

@@ -15,6 +15,35 @@ export interface Task {
   updatedAt: string;
 }
 
+export interface ResponseMeta {
+  requestId: string;
+}
+
+export interface TaskListResponse {
+  success: true;
+  data: Task[];
+  meta: ResponseMeta & { total: number };
+}
+
+export interface TaskResponse {
+  success: true;
+  data: Task;
+  meta: ResponseMeta;
+}
+
+export interface Health {
+  service: 'flowboard-api';
+  status: 'ok';
+  taskCount: number;
+  now: string;
+}
+
+export interface HealthResponse {
+  success: true;
+  data: Health;
+  meta: ResponseMeta;
+}
+
 export interface CreateTaskInput {
   title: string;
   description: string;
@@ -131,7 +160,7 @@ function parseMeta(value: unknown) {
   return { requestId: text(meta.requestId, 'meta.requestId', { min: 1, max: 120 }) };
 }
 
-export const taskListResponseSchema = parser((value) => {
+export const taskListResponseSchema = parser<TaskListResponse>((value) => {
   const response = record(value, 'response');
   if (response.success !== true || !Array.isArray(response.data)) {
     throw new ContractError([{ path: 'response', message: 'expected successful task list' }]);
@@ -144,7 +173,7 @@ export const taskListResponseSchema = parser((value) => {
   };
 });
 
-export const taskResponseSchema = parser((value) => {
+export const taskResponseSchema = parser<TaskResponse>((value) => {
   const response = record(value, 'response');
   if (response.success !== true) {
     throw new ContractError([{ path: 'response.success', message: 'expected true' }]);
@@ -152,7 +181,7 @@ export const taskResponseSchema = parser((value) => {
   return { success: true as const, data: parseTask(response.data), meta: parseMeta(response.meta) };
 });
 
-export const healthResponseSchema = parser((value) => {
+export const healthResponseSchema = parser<HealthResponse>((value) => {
   const response = record(value, 'response');
   const data = record(response.data, 'data');
   if (response.success !== true || data.service !== 'flowboard-api' || data.status !== 'ok') {

@@ -5,7 +5,19 @@ import {
   taskResponseSchema,
   updateTaskSchema,
 } from '../../../shared/task-contract.ts';
+import type { CreateTaskInput, UpdateTaskInput } from '../../../shared/task-contract.ts';
 import { getLabServiceUrl } from '@yida-lab/runtime';
+
+interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  body?: unknown;
+  signal?: AbortSignal;
+}
+
+interface RequestResult {
+  payload: unknown;
+  requestId: string;
+}
 
 const API_BASE_URL = getLabServiceUrl('flowboardApi');
 
@@ -16,7 +28,7 @@ function createRequestId() {
   return `flowboard-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-async function request(path, options = {}) {
+async function request(path: string, options: RequestOptions = {}): Promise<RequestResult> {
   const requestId = createRequestId();
   const response = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method || 'GET',
@@ -35,12 +47,12 @@ async function request(path, options = {}) {
   return { payload, requestId: response.headers.get('x-request-id') || requestId };
 }
 
-export async function fetchHealth(signal) {
+export async function fetchHealth(signal?: AbortSignal) {
   const result = await request('/health', { signal });
   return { data: healthResponseSchema.parse(result.payload), requestId: result.requestId };
 }
 
-export async function fetchTasks(filters, signal) {
+export async function fetchTasks(filters: { search: string; status: string }, signal?: AbortSignal) {
   const query = new URLSearchParams();
   if (filters.search) query.set('search', filters.search);
   if (filters.status !== 'all') query.set('status', filters.status);
@@ -49,7 +61,7 @@ export async function fetchTasks(filters, signal) {
   return { data: taskListResponseSchema.parse(result.payload), requestId: result.requestId };
 }
 
-export async function createTask(input) {
+export async function createTask(input: CreateTaskInput) {
   const result = await request('/tasks', {
     method: 'POST',
     body: createTaskSchema.parse(input),
@@ -57,7 +69,7 @@ export async function createTask(input) {
   return { data: taskResponseSchema.parse(result.payload), requestId: result.requestId };
 }
 
-export async function updateTask(id, input) {
+export async function updateTask(id: string, input: UpdateTaskInput) {
   const result = await request(`/tasks/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     body: updateTaskSchema.parse(input),
@@ -65,7 +77,7 @@ export async function updateTask(id, input) {
   return { data: taskResponseSchema.parse(result.payload), requestId: result.requestId };
 }
 
-export async function deleteTask(id) {
+export async function deleteTask(id: string) {
   const result = await request(`/tasks/${encodeURIComponent(id)}`, { method: 'DELETE' });
   return { data: taskResponseSchema.parse(result.payload), requestId: result.requestId };
 }

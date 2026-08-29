@@ -2,11 +2,12 @@ import React from 'react';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import Flowboard from '../src/Flowboard.canvas.jsx';
+import type { Task } from '../../shared/task-contract.ts';
+import Flowboard from '../src/Flowboard.canvas.tsx';
 
 const NOW = '2026-08-29T08:00:00.000Z';
 
-function response(payload, requestId, status = 200) {
+function response(payload: unknown, requestId: string, status = 200) {
   return Promise.resolve(
     new Response(JSON.stringify(payload), {
       status,
@@ -16,7 +17,7 @@ function response(payload, requestId, status = 200) {
 }
 
 function createFetchHarness() {
-  let tasks = [
+  let tasks: Task[] = [
     {
       id: 'task-local-preview',
       title: '验证本地预览',
@@ -30,7 +31,7 @@ function createFetchHarness() {
   ];
   let sequence = 0;
 
-  return vi.fn(async (input, init = {}) => {
+  return vi.fn(async (input: RequestInfo | URL, init: RequestInit = {}) => {
     const url = new URL(String(input));
     const requestId = `web-test-${++sequence}`;
     if (url.pathname === '/api/health') {
@@ -102,7 +103,7 @@ describe('Flowboard Canvas local preview', () => {
   test('surfaces contract failures as a visible development error', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn((input) => {
+      vi.fn((input: RequestInfo | URL) => {
         const url = new URL(String(input));
         const requestId = 'web-test-contract-error';
         if (url.pathname === '/api/health') {
