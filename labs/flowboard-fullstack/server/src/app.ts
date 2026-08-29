@@ -25,7 +25,7 @@ function isAllowedOrigin(origin: string, configuredOrigins: string[]) {
 
 export function createApp(options: { store?: TaskStore; allowedOrigins?: string[] } = {}) {
   const app = express();
-  const store = options.store || createTaskStore();
+  const store = options.store || createTaskStore({ seed: [] });
   const allowedOrigins = options.allowedOrigins || ['http://127.0.0.1:4317', 'http://localhost:4317'];
 
   app.disable('x-powered-by');

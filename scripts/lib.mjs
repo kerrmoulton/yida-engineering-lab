@@ -40,6 +40,7 @@ export async function loadManifest() {
   if (localTargets) {
     manifest.application.appType = localTargets.appType || manifest.application.appType;
     manifest.application.name = localTargets.applicationName || manifest.application.name;
+    manifest.application.webOrigin = localTargets.webOrigin || manifest.application.webOrigin;
     manifest.pages = manifest.pages.map((page) => ({
       ...page,
       formUuid: localTargets.pages?.[page.key]?.formUuid || page.formUuid,

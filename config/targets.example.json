@@ -1,6 +1,7 @@
 {
   "applicationName": "My Yida Test Application",
   "appType": "APP_REPLACE_WITH_YOUR_TEST_APP",
+  "webOrigin": "https://your-organization.aliwork.com",
   "pages": {
     "tailwind.runtime": {
       "formUuid": "FORM-REPLACE-WITH-RUNTIME-PAGE"

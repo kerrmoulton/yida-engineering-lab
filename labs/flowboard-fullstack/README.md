@@ -8,9 +8,9 @@
 - `web/preview/`：只负责挂载 Canvas 入口和显示开发状态的 Vite 壳层。
 - `web/test/`：Vitest + Testing Library 组件测试和浏览器环境适配。
 - `web/e2e/`：Playwright 浏览器 CRUD 与搜索回归。
-- `server/src/`：Express 应用、内存任务仓库与启动入口。
-- `server/test/`：HTTP、CORS/PNA、校验与 CRUD 集成测试。
-- `shared/`：前后端共同使用的任务类型与运行时解析器。
+- `server/src/`：Express 应用、SQLite 任务仓库与启动入口。
+- `server/test/`：HTTP、CORS/PNA、校验、CRUD、持久化与重置集成测试。
+- `shared/`：从 JSON Schema 自动生成、供前后端共用的任务类型与运行时解析器。
 - `dist/`：构建产物，由命令生成且不进入 Git。
 - `prd.md`、`design.md`：实验需求和页面设计约束。
 - `results/results.json`：不含真实应用 ID 的结构化验收记录。
@@ -29,7 +29,7 @@ npm run dev:flowboard
 
 Vite 直接导入 `web/src/Flowboard.canvas.tsx`，不会维护另一份预览页面。保存组件或样式后由 React Fast Refresh 更新页面并尽量保留表单状态；修改 Express 或共享契约后由 `tsx watch` 自动重启 API。编译错误由 Vite 错误浮层显示，运行时渲染错误由预览壳的 Error Boundary 显示。
 
-首次从 HTTPS 宜搭页面调用本地 API 时，浏览器可能询问是否允许该站点访问本地网络；允许后刷新页面即可继续。服务使用内存数据，重启会恢复三条种子任务。
+首次从 HTTPS 宜搭页面调用本地 API 时，浏览器可能询问是否允许该站点访问本地网络；允许后刷新页面即可继续。服务使用 `.local/flowboard/flowboard.sqlite`，热重启不会丢失数据；需要确定性初始状态时运行 `npm run reset:flowboard:db`。
 
 另开终端运行确定性检查：
 
@@ -42,6 +42,7 @@ npm run build:canvas
 npm run contract:check
 npx playwright install chromium
 npm run test:flowboard:e2e
+npm run test:flowboard:remote
 ```
 
 配置好被 Git 忽略的 `config/targets.local.json` 后，可发布和回读独立逻辑页面，不会覆盖其他实验：
@@ -65,5 +66,9 @@ npm run verify:flowboard
 - Express 源码变化触发 `tsx watch` 平滑终止并重启本地服务。
 - 组件测试覆盖 API 读取、任务创建和契约错误可视化反馈。
 - Playwright 自动完成真实浏览器新建、两次状态推进、删除、搜索和失败清理。
+- 远程只读冒烟测试复用专用 Chrome profile，自动检查真实 Canvas 首屏和 localhost API。
+- SQLite 自动化测试验证进程式重开后的持久化，以及 reset/seed 的确定性。
+- JSON Schema 自动生成前后端类型和轻量运行时解析器，CI 检查生成结果是否过期。
+- Vite 预览把业务入口、React 核心和 UI 依赖拆分缓存；Canvas 发布文件保持不变。
 
 实验中发现 Canvas 运行时内的浮层确认组件回调并不稳定，因此删除交互改为页面级受控 `Modal`。这项兼容性结论已固化在源码和浏览器回归结果中。

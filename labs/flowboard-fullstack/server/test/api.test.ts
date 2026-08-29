@@ -6,7 +6,8 @@ import { createApp } from '../src/app.ts';
 import { createTaskStore } from '../src/store.ts';
 
 async function withServer(run: (baseUrl: string) => Promise<void>) {
-  const server = createApp({ store: createTaskStore([]) }).listen(0, '127.0.0.1');
+  const store = createTaskStore({ seed: [] });
+  const server = createApp({ store }).listen(0, '127.0.0.1');
   await once(server, 'listening');
   const address = server.address() as AddressInfo;
   try {
@@ -14,6 +15,7 @@ async function withServer(run: (baseUrl: string) => Promise<void>) {
   } finally {
     server.close();
     await once(server, 'close');
+    store.close();
   }
 }
 

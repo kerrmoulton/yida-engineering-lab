@@ -16,6 +16,8 @@ Yida Engineering Lab 是面向宜搭 Code Canvas 的可复用工程能力实验�
 
 ## 本地配置
 
+本实验使用 Node.js 24 或更高版本，SQLite 直接采用 Node 内置的 `node:sqlite`，不需要额外安装本地数据库服务或原生 npm 驱动。
+
 仓库不提交真实应用 ID、页面 ID、登录态或远端 Schema。首次使用时复制示例配置：
 
 ```bash
@@ -34,16 +36,24 @@ npm run check
 npm run check:full
 npm run build:canvas
 npm run dev:flowboard
+npm run reset:flowboard:db
 npm run test:flowboard:web
 npm run test:flowboard:e2e
+npm run test:flowboard:remote
 npm run guard:live -- --page tailwind.runtime
 npm run publish:test -- --page tailwind.runtime
 npm run verify:remote -- --page tailwind.runtime
 ```
 
-`npm run dev:flowboard` 会同时启动 Vite Canvas 预览和可自动重启的 TypeScript API：页面位于 `http://127.0.0.1:4317`，API 位于 `http://127.0.0.1:4318/api`。本地预览直接加载同一份 `.canvas.tsx` 作者源码并支持 HMR；发布到宜搭后的联调仍需在浏览器首次提示时允许该域名访问本地网络。
+`npm run dev:flowboard` 会同时启动 Vite Canvas 预览和可自动重启的 TypeScript API：页面位于 `http://127.0.0.1:4317`，API 位于 `http://127.0.0.1:4318/api`。本地预览直接加载同一份 `.canvas.tsx` 作者源码并支持 HMR；API 使用 `.local/flowboard/flowboard.sqlite` 持久化数据，`npm run reset:flowboard:db` 可恢复三条确定性种子任务。发布到宜搭后的联调仍需允许该域名访问本地网络。
 
 首次运行浏览器 E2E 前执行 `npx playwright install chromium`。`npm run check` 运行不依赖浏览器的格式、Lint、类型、单测和构建检查；`npm run check:full` 在此基础上增加 Playwright 本地全链路测试。
+
+`npm run test:flowboard:remote` 会启动本地 API，并用独立且被 Git 忽略的 Chrome profile 打开真实宜搭页面，执行只读首屏冒烟检查。首次运行可能需要在打开的窗口里登录；后续复用该 profile。测试会自动授予页面本地网络访问权限，断言 Flowboard 标题、API 在线状态、任务卡片和页面运行时错误，并把截图与结构化证据写入 `.cache/playwright/flowboard/`。
+
+Flowboard 的任务字段契约以 `contracts/flowboard-task.schema.json` 为唯一事实源。修改字段后运行 `npm run contract:generate`；`npm run check` 会通过 `contract:generated:check` 阻止过期的 TypeScript 类型和运行时解析器进入提交。
+
+`build:flowboard:web` 只优化本地 Vite 预览：业务入口、React 核心和 UI 依赖会生成独立 chunk。Canvas 发布仍从 `.canvas.tsx` 经 `build:canvas` 生成单文件源码，并把 React、antd、lucide-react 保持为平台 `importedModules`；两条构建链路互不读取对方产物。
 
 本地检查会遍历 manifest 中的全部页面；守卫、发布和远端回读必须用 `--page` 明确指定一个逻辑页面，避免误覆盖。发布会先检查线上漂移，再执行 Canvas 发布和健康检查，最后为该页面单独更新本机基线。检测到线上内容偏离基线时会停止，不自动覆盖远端。
 

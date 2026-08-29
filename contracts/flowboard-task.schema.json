@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openyida.local/contracts/flowboard-task.schema.json",
+  "title": "Flowboard task contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "description", "status", "priority", "assignee", "createdAt", "updatedAt"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "description": { "type": "string", "maxLength": 500 },
+    "status": { "type": "string", "enum": ["backlog", "in_progress", "done"] },
+    "priority": { "type": "string", "enum": ["low", "medium", "high"] },
+    "assignee": { "type": "string", "maxLength": 60 },
+    "createdAt": { "type": "string", "format": "date-time", "minLength": 1, "maxLength": 40 },
+    "updatedAt": { "type": "string", "format": "date-time", "minLength": 1, "maxLength": 40 }
+  },
+  "x-createFields": ["title", "description", "priority", "assignee"],
+  "x-updateFields": ["title", "description", "status", "priority", "assignee"]
+}
