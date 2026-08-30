@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "sourceExtension": ".canvas.jsx",
+  "entryComponent": "YidaComp",
+  "requiredDefaultExport": true,
+  "allowedImports": ["react", "antd", "lucide-react"],
+  "forbiddenSourcePatterns": [
+    "window.antd",
+    "window.React",
+    "this.utils.yida",
+    "this.dataSourceMap",
+    "document.cookie",
+    "fetch(",
+    ".invoke("
+  ],
+  "requiredSourceMarkers": [
+    "data-yida-theme-root",
+    "data-platform-runtime-probe",
+    "matrix-rerun",
+    "matrix-evidence",
+    "searchFormDataIds",
+    "getProcessInstanceIds",
+    "matrix-ui-toast",
+    "matrix-ui-dialog",
+    "matrix-ui-preview",
+    "matrix-ui-open-page",
+    "matrix-ui-router-push",
+    "matrix-asset-script",
+    "matrix-asset-style",
+    "L4-readonly",
+    "export default YidaComp"
+  ],
+  "forbidEmoji": true
+}

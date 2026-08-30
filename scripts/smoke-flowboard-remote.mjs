@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { chromium } from '@playwright/test';
+import { completeKnownYidaLogin } from './browser/yida-login.mjs';
 import { loadTarget, readOptionalJson, root, writeJsonAtomic } from './lib.mjs';
 
 const target = await loadTarget({ requireRemote: true, pageKey: 'flowboard.board' });
@@ -48,58 +49,6 @@ async function ensureApi() {
   throw new Error('Flowboard API 未能在 20 秒内启动');
 }
 
-async function clickSingleVisible(locator, options = {}) {
-  if ((await locator.count()) !== 1 || !(await locator.isVisible())) return false;
-  await locator.click(options);
-  return true;
-}
-
-async function clickNamedControl(scope, name) {
-  const semanticButton = scope.getByRole('button', { name, exact: true });
-  if (await clickSingleVisible(semanticButton)) return true;
-  return clickSingleVisible(scope.getByText(name, { exact: true }));
-}
-
-async function completeKnownYidaLogin(page, heading) {
-  const actions = [];
-  const deadline = Date.now() + 120_000;
-  while (Date.now() < deadline) {
-    if (await heading.isVisible().catch(() => false)) return actions;
-    const activePages = page.locator('.app-page.app-page-curr');
-    const scope = (await activePages.count()) === 1 ? activePages : page;
-
-    const knownButtons = [
-      { name: '立即登录', action: 'account-login' },
-      { name: '同意', action: 'oauth-consent' },
-      { name: '登录', action: 'login' },
-    ];
-    let clickedKnownButton = false;
-    for (const button of knownButtons) {
-      if (await clickNamedControl(scope, button.name)) {
-        actions.push(button.action);
-        clickedKnownButton = true;
-        await page.waitForTimeout(500);
-        break;
-      }
-    }
-    if (clickedKnownButton) continue;
-
-    if (browserOrganization?.corpName) {
-      const organization = scope.getByText(browserOrganization.corpName, { exact: true });
-      const organizationRow = organization.locator('xpath=ancestor::tr[1]');
-      const target = (await organizationRow.count()) === 1 ? organizationRow : organization;
-      if (await clickSingleVisible(target, { force: true })) {
-        actions.push(`organization:${browserOrganization.corpId || browserOrganization.corpName}`);
-        await page.waitForTimeout(500);
-        continue;
-      }
-    }
-
-    await page.waitForTimeout(500);
-  }
-  return actions;
-}
-
 await ensureApi();
 const profilePath = path.join(root, '.local/playwright/flowboard-remote-profile');
 await fs.mkdir(profilePath, { recursive: true });
@@ -118,7 +67,7 @@ try {
   const screenshotPath = path.join(root, `.cache/playwright/flowboard/remote-smoke-${transport}.png`);
   await fs.mkdir(path.dirname(screenshotPath), { recursive: true });
   const heading = page.getByRole('heading', { name: 'Flowboard' });
-  const loginActions = await completeKnownYidaLogin(page, heading);
+  const loginActions = await completeKnownYidaLogin(page, heading, browserOrganization);
   try {
     await heading.waitFor({ state: 'visible', timeout: 10_000 });
   } catch (error) {

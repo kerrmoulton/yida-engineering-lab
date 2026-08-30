@@ -42,6 +42,18 @@ npm run test:flowboard:e2e
 npm run test:flowboard:remote
 npm run test:flowboard:remote:direct
 npm run test:flowboard:remote:connector
+npm run test:platform:remote
+npm run test:platform:native:remote
+npm run test:platform:file-storage:remote
+npm run run:platform:file-lifecycle:once
+npm run test:platform:api:remote
+npm run test:platform:crud:remote
+npm run test:platform:process:remote
+npm run test:platform:js-api-matrix:remote
+npm run run:platform:process:once
+npm run run:platform:process:terminate-once
+npm run run:platform:process:complete-once
+npm run run:platform:process:delete-once
 npm run tunnel:flowboard
 npm run guard:live -- --page tailwind.runtime
 npm run publish:test -- --page tailwind.runtime
@@ -57,6 +69,24 @@ npm run verify:remote -- --page tailwind.runtime
 Flowboard 的任务字段契约以 `contracts/flowboard-task.schema.json` 为唯一事实源。修改字段后运行 `npm run contract:generate`；`npm run check` 会通过 `contract:generated:check` 阻止过期的 TypeScript 类型和运行时解析器进入提交。
 
 `build:flowboard:web` 只优化本地 Vite 预览：业务入口、React 核心和 UI 依赖会生成独立 chunk。Canvas 发布仍从 `.canvas.tsx` 经 `build:canvas` 生成单文件源码，并把 React、antd、lucide-react 保持为平台 `importedModules`；两条构建链路互不读取对方产物。
+
+平台运行时实验使用逻辑资源键引用测试表单。作者源码只写 `platform.formSandbox`，真实 `formUuid` 由本机 `targets.local.json` 在构建时注入。`test:platform:api:remote` 只调用字段定义与数据列表两个白名单读方法，并只保存返回形状，不保存人员、字段或记录值。
+
+`test:platform:native:remote` 验证宜搭运行时注入的原生组件。默认只用内存生成的小文件并强制 `autoUpload=false`，验证本地选择、结构归一化、清空和受控回填，不产生远端文件；`DataManageViews` 只做空数据只读挂载。只有显式设置 `YIDA_LAB_ALLOW_SYNTHETIC_UPLOAD=1` 才会尝试把同一批伪造文件上传，且可用 `YIDA_LAB_SYNTHETIC_UPLOAD_COMPONENTS=ImageField` 限定组件；脚本不读取磁盘文件。
+
+`test:platform:file-storage:remote` 打开专用普通表单的新增抽屉，验证真实 `AttachmentField` 和 `ImageField` 容器。默认只确认字段和两个文件 input 存在，不上传；显式设置 `YIDA_LAB_ALLOW_SYNTHETIC_UPLOAD=1` 后，只使用内存生成的微型 TXT 和 PNG，验证传输成功、字段条目、图片预览和字段移除，全程不填写实验标记、不点击提交，因此不创建表单记录。证据不保存 URL、响应体或文件内容；字段移除不被当作底层临时存储物理删除保证。
+
+`run:platform:file-lifecycle:once` 是独立的高风险闭环，必须显式设置 `YIDA_LAB_CONFIRM_FILE_LIFECYCLE=1`。它从 Canvas 的标准入口打开原生 submission 表单，只上传内存生成的微型 TXT 和 PNG；上传完成后再填写短唯一标记，提交恰好一条记录，通过宜搭 JS API 读回附件与图片字段结构，只按捕获到的 `formInstId` 删除，并轮询确认该标记归零。结构化证据会脱敏写入 `.cache/playwright/platform-file-lifecycle/`。删除表单记录不被当作底层文件对象已立即物理删除的保证。
+
+`platform.nativeComponents` 页面已经把这条结论封装成标准表单入口：Canvas 通过 `platform.fileSandbox` 逻辑资源键构建 submission 路由，PC 端使用 50% 宽的 `FormOpenContainer` 抽屉，移动端进入原生提交页；iframe 固定带 `isRenderNav=false` 并同步页面主题。默认远程回归只验证抽屉和两个字段加载，不触发文件选择或上传。
+
+`test:platform:crud:remote` 只操作专用实验表单：最多创建一条唯一标记记录，精确验证创建、查询、详情和更新后，再使用创建响应中的 `formInstId` 删除并确认标记查询为零。写入必须由页面上的两个独立按钮显式触发，页面加载本身始终无写副作用。
+
+`test:platform:js-api-matrix:remote` 在独立页面验证首批 10 个无写副作用 API，并通过独立按钮验证 5 个受控 UI/导航 API 以及 `loadScript`、`loadStyleSheet` 两个外部资源加载 API。导航目标由逻辑页面键注入并限制为同一测试应用；外部资源使用固定测试 URL，并验证加载后的实际 DOM/全局效果。结构化证据只保存能力状态、返回类型、顶层字段名、集合数量和是否有值，不保存用户、实例或字段值。
+
+流程沙箱只处理当前登录人发起、当前登录人处理且带实验标记的唯一实例。发起、终止、更新并同意分别要求 `YIDA_LAB_CONFIRM_SELF_ONLY_PROCESS=1`、`YIDA_LAB_CONFIRM_SELF_ONLY_TERMINATE=1`、`YIDA_LAB_CONFIRM_SELF_ONLY_COMPLETE=1`。完成链路会先回读更新字段，再以当前用户 `AGREE` 唯一待办，最终要求实例为 `COMPLETED`、当前用户待办为零且出现同意历史记录。流程状态和审批记录存在短暂最终一致性，页面使用有上限的只读轮询。
+
+流程实例删除使用独立一次性命令 `run:platform:process:delete-once`，必须设置 `YIDA_LAB_CONFIRM_SELF_ONLY_DELETE=1`。脚本最多发起一条删除专用随机标记流程；删除前重新核对目标应用、专用表单、标记、实例 ID、RUNNING 状态、发起人以及全部处理人均为当前登录用户，只把捕获 ID 传给 `deleteProcessInstance`。删除后同时要求列表标记归零且原 ID 详情不可读取；若发起成功但响应未直接返回 ID，脚本只允许从完整字段匹配的唯一运行中删除实验实例恢复，不会创建第二条或触碰历史实例。
 
 本地检查会遍历 manifest 中的全部页面；守卫、发布和远端回读必须用 `--page` 明确指定一个逻辑页面，避免误覆盖。发布会先检查线上漂移，再执行 Canvas 发布和健康检查，最后为该页面单独更新本机基线。检测到线上内容偏离基线时会停止，不自动覆盖远端。
 

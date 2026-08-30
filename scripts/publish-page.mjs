@@ -27,7 +27,7 @@ const guard = await evaluateLiveGuard({ pageKey: target.page.key });
 console.log(JSON.stringify({ stage: 'live-guard', ...guard }, null, 2));
 
 const publishOutput = run(
-  'openyida',
+  process.env.YIDA_LAB_OPENYIDA_BIN || 'openyida',
   ['publish', sourcePath, target.appType, target.page.formUuid, '--canvas', '--health-check'],
   { echo: true },
 );

@@ -17,6 +17,24 @@
     },
     "flowboard.board": {
       "formUuid": "FORM-REPLACE-WITH-FLOWBOARD-PAGE"
+    },
+    "platform.runtimeInventory": {
+      "formUuid": "FORM-REPLACE-WITH-RUNTIME-INVENTORY-PAGE"
+    },
+    "platform.nativeComponents": {
+      "formUuid": "FORM-REPLACE-WITH-NATIVE-COMPONENTS-PAGE"
+    },
+    "platform.apiBridge": {
+      "formUuid": "FORM-REPLACE-WITH-API-BRIDGE-PAGE"
+    },
+    "platform.apiCrud": {
+      "formUuid": "FORM-REPLACE-WITH-API-CRUD-PAGE"
+    },
+    "platform.processSandbox": {
+      "formUuid": "FORM-REPLACE-WITH-PROCESS-SANDBOX-PAGE"
+    },
+    "platform.jsApiMatrix": {
+      "formUuid": "FORM-REPLACE-WITH-JS-API-MATRIX-PAGE"
     }
   },
   "services": {
@@ -27,6 +45,37 @@
   "connectors": {
     "flowboardApi": {
       "connectorId": "Http_REPLACE_WITH_YIDA_TEST_CONNECTOR"
+    }
+  },
+  "resources": {
+    "platform.formSandbox": {
+      "formUuid": "FORM-REPLACE-WITH-PLATFORM-SANDBOX",
+      "fields": {
+        "experimentTag": "textField_REPLACE_WITH_EXPERIMENT_TAG",
+        "operationType": "selectField_REPLACE_WITH_OPERATION_TYPE",
+        "summary": "textField_REPLACE_WITH_SUMMARY",
+        "payload": "textareaField_REPLACE_WITH_PAYLOAD",
+        "experimentUser": "employeeField_REPLACE_WITH_EXPERIMENT_USER",
+        "experimentTime": "dateField_REPLACE_WITH_EXPERIMENT_TIME"
+      }
+    },
+    "platform.fileSandbox": {
+      "formUuid": "FORM-REPLACE-WITH-FILE-SANDBOX",
+      "fields": {
+        "experimentTag": "textField_REPLACE_WITH_FILE_EXPERIMENT_TAG",
+        "syntheticAttachment": "attachmentField_REPLACE_WITH_SYNTHETIC_ATTACHMENT",
+        "syntheticImage": "imageField_REPLACE_WITH_SYNTHETIC_IMAGE"
+      }
+    },
+    "platform.processSandbox": {
+      "formUuid": "FORM-REPLACE-WITH-PROCESS-SANDBOX",
+      "processCode": "TPROC-REPLACE-WITH-PROCESS-CODE",
+      "fields": {
+        "experimentTag": "textField_REPLACE_WITH_PROCESS_EXPERIMENT_TAG",
+        "summary": "textField_REPLACE_WITH_PROCESS_SUMMARY",
+        "payload": "textareaField_REPLACE_WITH_PROCESS_PAYLOAD",
+        "experimentTime": "dateField_REPLACE_WITH_PROCESS_EXPERIMENT_TIME"
+      }
     }
   }
 }

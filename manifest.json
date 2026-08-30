@@ -25,6 +25,46 @@
       "connectorId": null
     }
   ],
+  "resources": [
+    {
+      "key": "platform.formSandbox",
+      "name": "宜搭平台运行时实验数据",
+      "kind": "form",
+      "formUuid": null,
+      "fields": {
+        "experimentTag": null,
+        "operationType": null,
+        "summary": null,
+        "payload": null,
+        "experimentUser": null,
+        "experimentTime": null
+      }
+    },
+    {
+      "key": "platform.fileSandbox",
+      "name": "宜搭文件存储实验沙箱",
+      "kind": "form",
+      "formUuid": null,
+      "fields": {
+        "experimentTag": null,
+        "syntheticAttachment": null,
+        "syntheticImage": null
+      }
+    },
+    {
+      "key": "platform.processSandbox",
+      "name": "宜搭平台运行时流程实验",
+      "kind": "process",
+      "formUuid": null,
+      "processCode": null,
+      "fields": {
+        "experimentTag": null,
+        "summary": null,
+        "payload": null,
+        "experimentTime": null
+      }
+    }
+  ],
   "pages": [
     {
       "key": "tailwind.runtime",
@@ -69,6 +109,90 @@
       },
       "contract": "contracts/flowboard-canvas.contract.json",
       "baseline": "release/baselines/flowboard.board.test.json"
+    },
+    {
+      "key": "platform.runtimeInventory",
+      "name": "宜搭运行时只读探针",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/RuntimeInventory.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/RuntimeInventory.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-runtime-canvas.contract.json",
+      "baseline": "release/baselines/platform.runtimeInventory.test.json"
+    },
+    {
+      "key": "platform.nativeComponents",
+      "name": "宜搭原生组件兼容性实验",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/NativeComponents.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/NativeComponents.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-runtime-canvas.contract.json",
+      "baseline": "release/baselines/platform.nativeComponents.test.json"
+    },
+    {
+      "key": "platform.apiBridge",
+      "name": "宜搭 API 桥只读实验",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/ApiBridge.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/ApiBridge.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-api-bridge-canvas.contract.json",
+      "baseline": "release/baselines/platform.apiBridge.test.json"
+    },
+    {
+      "key": "platform.apiCrud",
+      "name": "宜搭 API 桥受控 CRUD 实验",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/ApiCrud.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/ApiCrud.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-api-crud-canvas.contract.json",
+      "baseline": "release/baselines/platform.apiCrud.test.json"
+    },
+    {
+      "key": "platform.processSandbox",
+      "name": "宜搭平台流程沙箱",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/ProcessSandbox.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/ProcessSandbox.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-process-sandbox-canvas.contract.json",
+      "baseline": "release/baselines/platform.processSandbox.test.json"
+    },
+    {
+      "key": "platform.jsApiMatrix",
+      "name": "宜搭 JS API 能力矩阵",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/JsApiMatrix.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/JsApiMatrix.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/platform-js-api-matrix-canvas.contract.json",
+      "baseline": "release/baselines/platform.jsApiMatrix.test.json"
     }
   ]
 }

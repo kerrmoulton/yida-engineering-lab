@@ -53,6 +53,17 @@ export async function loadManifest() {
       ...connector,
       connectorId: localTargets.connectors?.[connector.key]?.connectorId || connector.connectorId,
     }));
+    manifest.resources = (manifest.resources || []).map((resource) => ({
+      ...resource,
+      formUuid: localTargets.resources?.[resource.key]?.formUuid || resource.formUuid,
+      processCode: localTargets.resources?.[resource.key]?.processCode || resource.processCode,
+      fields: Object.fromEntries(
+        Object.entries(resource.fields || {}).map(([fieldKey, fieldId]) => [
+          fieldKey,
+          localTargets.resources?.[resource.key]?.fields?.[fieldKey] || fieldId,
+        ]),
+      ),
+    }));
   }
 
   for (const page of manifest.pages) {
@@ -99,6 +110,66 @@ export function createServiceUrlMap(manifest, { requireConfigured = false } = {}
   );
 }
 
+export function createResourceIdMap(manifest, { requireConfigured = false } = {}) {
+  const resources = manifest.resources || [];
+  const keys = resources.map((resource) => resource.key);
+  if (keys.some((key) => !key) || new Set(keys).size !== keys.length) {
+    throw new Error('manifest.json 中每个资源必须有唯一 key');
+  }
+  return Object.fromEntries(
+    resources.map((resource) => {
+      if (requireConfigured && !resource.formUuid) {
+        throw new Error(`资源 ${resource.key} 缺少 formUuid 映射`);
+      }
+      return [
+        resource.key,
+        resource.formUuid || `#unconfigured-resource=${encodeURIComponent(resource.key)}`,
+      ];
+    }),
+  );
+}
+
+export function createResourceFieldIdMap(manifest, { requireConfigured = false } = {}) {
+  return Object.fromEntries(
+    (manifest.resources || []).map((resource) => {
+      const fields = resource.fields || {};
+      const fieldKeys = Object.keys(fields);
+      if (fieldKeys.some((key) => !key) || new Set(fieldKeys).size !== fieldKeys.length) {
+        throw new Error(`资源 ${resource.key} 的字段必须有唯一 key`);
+      }
+      return [
+        resource.key,
+        Object.fromEntries(
+          Object.entries(fields).map(([fieldKey, fieldId]) => {
+            if (requireConfigured && !fieldId) {
+              throw new Error(`资源 ${resource.key} 的字段 ${fieldKey} 缺少 fieldId 映射`);
+            }
+            return [
+              fieldKey,
+              fieldId || `#unconfigured-resource-field=${encodeURIComponent(`${resource.key}.${fieldKey}`)}`,
+            ];
+          }),
+        ),
+      ];
+    }),
+  );
+}
+
+export function createResourceProcessCodeMap(manifest, { requireConfigured = false } = {}) {
+  const resources = (manifest.resources || []).filter((resource) => resource.kind === 'process');
+  return Object.fromEntries(
+    resources.map((resource) => {
+      if (requireConfigured && !resource.processCode) {
+        throw new Error(`流程资源 ${resource.key} 缺少 processCode 映射`);
+      }
+      return [
+        resource.key,
+        resource.processCode || `#unconfigured-process=${encodeURIComponent(resource.key)}`,
+      ];
+    }),
+  );
+}
+
 export function createPageRouteMap(manifest, { requireRemote = false } = {}) {
   const appType = manifest.application?.appType;
   return Object.fromEntries(
@@ -115,11 +186,22 @@ export function createPageRouteMap(manifest, { requireRemote = false } = {}) {
   );
 }
 
-export function createLabRuntimeModule({ routes, services, connectors = {}, profile = {} }) {
+export function createLabRuntimeModule({
+  routes,
+  services,
+  connectors = {},
+  resources = {},
+  resourceFields = {},
+  resourceProcessCodes = {},
+  profile = {},
+}) {
   return `
 const PAGE_ROUTES = ${JSON.stringify(routes)};
 const SERVICE_URLS = ${JSON.stringify(services)};
 const CONNECTOR_IDS = ${JSON.stringify(connectors)};
+const RESOURCE_IDS = ${JSON.stringify(resources)};
+const RESOURCE_FIELD_IDS = ${JSON.stringify(resourceFields)};
+const RESOURCE_PROCESS_CODES = ${JSON.stringify(resourceProcessCodes)};
 const RUNTIME_PROFILE = ${JSON.stringify(profile)};
 export function getLabPageUrl(key) {
   const value = PAGE_ROUTES[key];
@@ -134,6 +216,21 @@ export function getLabServiceUrl(key) {
 export function getLabConnectorId(key) {
   const value = CONNECTOR_IDS[key];
   if (!value) throw new Error('Unknown Yida Lab connector key: ' + key);
+  return value;
+}
+export function getLabResourceId(key) {
+  const value = RESOURCE_IDS[key];
+  if (!value) throw new Error('Unknown Yida Lab resource key: ' + key);
+  return value;
+}
+export function getLabResourceFieldId(resourceKey, fieldKey) {
+  const value = RESOURCE_FIELD_IDS[resourceKey]?.[fieldKey];
+  if (!value) throw new Error('Unknown Yida Lab resource field key: ' + resourceKey + '.' + fieldKey);
+  return value;
+}
+export function getLabResourceProcessCode(resourceKey) {
+  const value = RESOURCE_PROCESS_CODES[resourceKey];
+  if (!value) throw new Error('Unknown Yida Lab process resource key: ' + resourceKey);
   return value;
 }
 export function getLabRuntimeProfile() {

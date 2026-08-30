@@ -5,6 +5,9 @@ import {
   createLabRuntimeModule,
   createConnectorIdMap,
   createPageRouteMap,
+  createResourceFieldIdMap,
+  createResourceIdMap,
+  createResourceProcessCodeMap,
   createServiceUrlMap,
   loadManifest,
   readJson,
@@ -18,6 +21,11 @@ const manifest = await loadManifest();
 const routes = createPageRouteMap(manifest, { requireRemote: requireTargets });
 const services = createServiceUrlMap(manifest, { requireConfigured: requireTargets });
 const connectors = createConnectorIdMap(manifest, { requireConfigured: requireTargets });
+const resources = createResourceIdMap(manifest, { requireConfigured: requireTargets });
+const resourceFields = createResourceFieldIdMap(manifest, { requireConfigured: requireTargets });
+const resourceProcessCodes = createResourceProcessCodeMap(manifest, {
+  requireConfigured: requireTargets,
+});
 const tailwindPages = manifest.pages.filter((page) => page.build?.kind === 'tailwind');
 let css = null;
 
@@ -65,7 +73,15 @@ for (const page of manifest.pages) {
       routes,
       services,
       connectors,
-      profile: { stage: 'test', defaultTransport: 'connector', allowDirectOverride: true },
+      resources,
+      resourceFields,
+      resourceProcessCodes,
+      profile: {
+        stage: 'test',
+        defaultTransport: 'connector',
+        allowDirectOverride: true,
+        expectedAppType: manifest.application.appType || null,
+      },
     });
     const result = await build({
       entryPoints: [authorSourcePath],
@@ -126,6 +142,9 @@ console.log(
       routes,
       services,
       connectors,
+      resources,
+      resourceFields,
+      resourceProcessCodes,
       cssBytes: css ? Buffer.byteLength(css) : 0,
       outputs,
     },

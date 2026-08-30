@@ -10,7 +10,7 @@
 
 - `canvas-tailwind`：验证运行时样式框架与本地静态 CSS 构建。
 - `flowboard-fullstack`：验证 Canvas、多文件前端工程与 localhost TypeScript API 联调。
-- `canvas-components`：验证第三方组件和宜搭运行态组件兼容性。
+- `yida-platform-runtime`：验证宜搭页面上下文、JS API 和运行态原生组件兼容性。
 - `data-binding`：验证表单数据桥、字段契约和错误处理。
 - `realtime`：验证 SSE 或 WebSocket 等长连接能力。
 

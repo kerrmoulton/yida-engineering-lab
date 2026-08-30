@@ -6,6 +6,9 @@ import {
   createConnectorIdMap,
   createLabRuntimeModule,
   createPageRouteMap,
+  createResourceFieldIdMap,
+  createResourceIdMap,
+  createResourceProcessCodeMap,
   digest,
   extractJsonDocuments,
   findCanvasComponent,
@@ -83,7 +86,15 @@ test('local preview and Canvas builds can share one virtual runtime module', () 
     routes: { 'flowboard.board': '/APP_TEST/workbench/FORM_FLOWBOARD' },
     services: { flowboardApi: 'http://127.0.0.1:4318/api' },
     connectors: { flowboardApi: 'Http_TEST' },
-    profile: { stage: 'test', defaultTransport: 'connector', allowDirectOverride: true },
+    resources: { 'platform.formSandbox': 'FORM_SANDBOX' },
+    resourceFields: { 'platform.formSandbox': { experimentTag: 'textField_TEST' } },
+    resourceProcessCodes: { 'platform.processSandbox': 'TPROC_TEST' },
+    profile: {
+      stage: 'test',
+      defaultTransport: 'connector',
+      allowDirectOverride: true,
+      expectedAppType: 'APP_TEST',
+    },
   });
   assert.match(source, /getLabPageUrl/);
   assert.match(source, /getLabServiceUrl/);
@@ -91,6 +102,45 @@ test('local preview and Canvas builds can share one virtual runtime module', () 
   assert.match(source, /127\.0\.0\.1:4318/);
   assert.match(source, /Http_TEST/);
   assert.match(source, /allowDirectOverride/);
+  assert.match(source, /expectedAppType/);
+  assert.match(source, /getLabResourceId/);
+  assert.match(source, /FORM_SANDBOX/);
+  assert.match(source, /getLabResourceFieldId/);
+  assert.match(source, /textField_TEST/);
+  assert.match(source, /getLabResourceProcessCode/);
+  assert.match(source, /TPROC_TEST/);
+});
+
+test('resource map keeps real form IDs out of public configuration', () => {
+  const manifest = {
+    resources: [{ key: 'platform.formSandbox', formUuid: null }],
+  };
+  assert.deepEqual(createResourceIdMap(manifest), {
+    'platform.formSandbox': '#unconfigured-resource=platform.formSandbox',
+  });
+  assert.throws(() => createResourceIdMap(manifest, { requireConfigured: true }), /formUuid/);
+});
+
+test('resource field map requires explicit field IDs for guarded builds', () => {
+  const manifest = {
+    resources: [{ key: 'platform.formSandbox', fields: { experimentTag: null } }],
+  };
+  assert.deepEqual(createResourceFieldIdMap(manifest), {
+    'platform.formSandbox': {
+      experimentTag: '#unconfigured-resource-field=platform.formSandbox.experimentTag',
+    },
+  });
+  assert.throws(() => createResourceFieldIdMap(manifest, { requireConfigured: true }), /fieldId/);
+});
+
+test('process resource map keeps process codes environment-specific', () => {
+  const manifest = {
+    resources: [{ key: 'platform.processSandbox', kind: 'process', processCode: null }],
+  };
+  assert.deepEqual(createResourceProcessCodeMap(manifest), {
+    'platform.processSandbox': '#unconfigured-process=platform.processSandbox',
+  });
+  assert.throws(() => createResourceProcessCodeMap(manifest, { requireConfigured: true }), /processCode/);
 });
 
 test('connector map requires explicit environment mapping for guarded builds', () => {

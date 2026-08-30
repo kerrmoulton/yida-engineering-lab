@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/yida-engineering-lab/platform-runtime-evidence.schema.json",
+  "title": "Yida Platform Runtime Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "runId", "pageKey", "environment", "capabilities", "safety"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "runId": { "type": "string", "pattern": "^[A-Za-z0-9._-]+$" },
+    "pageKey": { "type": "string", "pattern": "^platform\\." },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expectedAppMatched", "windowLevel", "client"],
+      "properties": {
+        "expectedAppMatched": { "type": "boolean" },
+        "windowLevel": { "enum": ["current", "parent", "top", "multiple", "unavailable"] },
+        "client": { "enum": ["pc", "mobile", "dingtalk", "unknown"] }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "kind", "status", "source"],
+        "properties": {
+          "name": { "type": "string" },
+          "kind": { "enum": ["context", "api", "component"] },
+          "status": { "enum": ["official", "observed", "verified", "unstable", "unsupported"] },
+          "source": { "enum": ["current", "parent", "top", "bridge", "local", "none"] },
+          "shape": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "sensitiveValuesRedacted", "unknownFunctionsCalled", "mutations"],
+      "properties": {
+        "level": { "enum": ["L0", "L1", "L2", "L3"] },
+        "sensitiveValuesRedacted": { "const": true },
+        "unknownFunctionsCalled": { "const": false },
+        "mutations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "tag", "status"],
+            "properties": {
+              "kind": { "enum": ["formRecord", "processInstance"] },
+              "tag": { "type": "string", "pattern": "^YIDA_RUNTIME_LAB_" },
+              "status": { "enum": ["created", "verified", "cleaned", "pending-user", "unknown"] }
+            }
+          }
+        },
+        "processSelfOnlyVerified": { "type": "boolean" }
+      }
+    }
+  }
+}
