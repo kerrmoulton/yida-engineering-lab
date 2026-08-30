@@ -17,6 +17,15 @@
     "document.cookie",
     "localStorage.getItem('token')"
   ],
-  "requiredSourceMarkers": ["data-yida-theme-root", "data-file-import-probe", "export default YidaComp"],
+  "requiredSourceMarkers": [
+    "data-yida-theme-root",
+    "data-file-import-probe",
+    "importService.importFile",
+    "custom-file-picker",
+    "hidden-browser-file-input",
+    "custom-native-file-picker",
+    "hidden-native-attachment-host",
+    "export default YidaComp"
+  ],
   "forbidEmoji": true
 }

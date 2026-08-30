@@ -22,6 +22,10 @@
 
 文件导入实验已验证两条完整可用路径：同一个内存伪造 XLSX 可从宜搭 Canvas 通过公网或 localhost 标准 multipart 上传并由 Express 解析为 3 行；浏览器也可本地解析后，通过 localhost 或宜搭 HTTP 连接器提交 JSON。第三条宜搭附件中转路径受部署环境鉴权策略影响，不纳入可复用的本地开发链路；实验在此收敛，`temporaryUrl.enabled` 默认保持 `false`，不再发起真实 OpenAPI 请求。systemToken 只能保存在平台连接器或本地秘密配置中，不能打包进 Canvas。
 
+页面现已收敛到单一 `importService.importFile(file, options?)` 契约。默认调用不感知环境：运行时 profile 在本地选择 localhost multipart，在宜搭测试构建选择浏览器解析加连接器 JSON；实验页可显式覆盖通道用于对照。三个适配器都归一化为 `FileImportResult`，统一提供状态、行数、接收数、传输方式、请求标识和诊断信息。宜搭附件适配器只参加无外部请求的契约测试，不参加真实回归。
+
+文件选择界面也与上传实现解耦：页面只展示自定义按钮，普通通道由按钮触发屏幕外的浏览器文件输入；宜搭原生附件通道将 `AttachmentField` 挂载在屏幕外。真实页面验证确认两颗自定义按钮都能打开文件框，宜搭通道实际命中组件内部的 `input[type=file]`。若其他运行态未暴露可触发控件，页面显示确定性的失败代码，不回退为可见原生组件。
+
 真实表单字段容器对照实验已经完成：专用 `platform.fileSandbox` 普通表单中的 `AttachmentField` 和 `ImageField` 均能使用同一批内存伪造文件完成成功传输；附件条目和图片缩略图可见，随后都能从字段值中移除。脚本始终不填写必填实验标记、不点击提交，数据管理列表保持零记录。该对照证明宜搭内建上传上下文属于真实表单字段容器，并不会自动下放给独立 Canvas 中手工挂载的同名组件。字段移除只证明本次表单值已清空，不声明底层临时 OSS 对象已立即物理删除。
 
 Canvas 业务接入路径也已完成：`platform.nativeComponents` 使用标准 `FormOpenContainer` 在 PC 端半屏抽屉内打开文件沙箱 submission 页，移动端则进入原生提交页。路由固定带 `isRenderNav=false`，iframe 加载后同步全局主题；真实表单 ID 只通过构建期逻辑资源映射注入。远端回归确认入口、抽屉、submission 路由及两个上传字段可用，默认不会选择或上传文件。

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Button, Card, ConfigProvider, Drawer, Radio, Space, Table, Tag, Upload } from 'antd';
+import { Alert, Button, Card, ConfigProvider, Drawer, Radio, Space, Table, Tag } from 'antd';
 import { FileJson, FileUp, FlaskConical, Network, ShieldCheck } from 'lucide-react';
 import { getLabResourceId, getLabRuntimeProfile } from '@yida-lab/runtime';
 import {
@@ -13,7 +13,15 @@ import {
   type JsonTransport,
   type UploadEndpoint,
 } from './file-import-client.ts';
+import {
+  createFileImportService,
+  FileImportServiceError,
+  resolveDefaultFileImportRequest,
+  type FileImportRequest,
+  type FileImportResult,
+} from './file-import-service.ts';
 import { FILE_IMPORT_CSS } from './file-import-styles.ts';
+import { triggerFilePicker } from './file-picker.ts';
 import { resolveNativeComponent } from './native-components.ts';
 import { runYidaAttachmentRelay } from './yida-attachment-relay.ts';
 
@@ -30,24 +38,36 @@ function readBrandColor() {
   }
 }
 
-function summarize(payload: unknown) {
-  if (!payload || typeof payload !== 'object') return String(payload);
-  const value = payload as { data?: Record<string, unknown>; meta?: { requestId?: string } };
+function summarize(result: FileImportResult) {
   return JSON.stringify(
     {
-      channel: value.data?.channel,
-      rowCount: value.data?.rowCount,
-      acceptedRows: value.data?.acceptedRows,
-      sha256: value.data?.sha256 || value.data?.payloadSha256,
-      requestId: value.meta?.requestId,
+      interface: 'importService.importFile',
+      channel: result.channel,
+      transport: result.transport,
+      rowCount: result.rowCount,
+      acceptedRows: result.acceptedRows,
+      parser: result.diagnostics.parser,
+      requestId: result.requestId,
     },
     null,
     2,
   );
 }
 
+function errorDetail(error: unknown) {
+  if (error instanceof FileImportServiceError) {
+    return JSON.stringify(
+      { interface: 'importService.importFile', channel: error.channel, phase: error.phase, code: error.code },
+      null,
+      2,
+    );
+  }
+  return error instanceof Error ? error.message : String(error);
+}
+
 function YidaComp() {
   const profile = getLabRuntimeProfile();
+  const { defaultTransport, stage } = profile;
   const fileSandboxFormUuid = getLabResourceId('platform.fileSandbox');
   const actualAppType =
     (window as unknown as { pageConfig?: { appType?: string } }).pageConfig?.appType || '';
@@ -60,11 +80,26 @@ function YidaComp() {
   const [relayResult, setRelayResult] = React.useState<ResultState>(INITIAL_RESULT);
   const [jsonResult, setJsonResult] = React.useState<ResultState>(INITIAL_RESULT);
   const [fileFormOpen, setFileFormOpen] = React.useState(false);
+  const browserPickerHostRef = React.useRef<HTMLDivElement | null>(null);
+  const nativePickerHostRef = React.useRef<HTMLDivElement | null>(null);
   const attachment = React.useMemo(
     () => resolveNativeComponent(window as unknown as Record<string, unknown>, 'AttachmentField'),
     [],
   );
   const NativeAttachment = attachment.component;
+  const importService = React.useMemo(
+    () =>
+      createFileImportService(
+        {
+          uploadMultipart,
+          parseWorkbook,
+          submitParsedRows,
+          relayYidaAttachment: runYidaAttachmentRelay,
+        },
+        { defaultRequest: resolveDefaultFileImportRequest({ defaultTransport, stage }) },
+      ),
+    [defaultTransport, stage],
+  );
 
   const chooseFile = React.useCallback(async (nextFile: File) => {
     setFile(nextFile);
@@ -78,45 +113,67 @@ function YidaComp() {
     await chooseFile(await createSyntheticWorkbookFile());
   }, [chooseFile]);
 
-  const runDirect = React.useCallback(async () => {
-    if (!file) return;
-    setDirectResult({ status: 'running', detail: '正在发送 multipart 文件' });
-    try {
-      const payload = await uploadMultipart(file, uploadEndpoint);
-      setDirectResult({ status: 'passed', detail: summarize(payload) });
-    } catch (error) {
-      setDirectResult({ status: 'failed', detail: error instanceof Error ? error.message : String(error) });
+  const openBrowserPicker = React.useCallback(() => {
+    const result = triggerFilePicker(browserPickerHostRef.current);
+    if (!result.opened) {
+      setDirectResult({ status: 'failed', detail: result.code });
     }
-  }, [file, uploadEndpoint]);
+  }, []);
+
+  const openNativePicker = React.useCallback(() => {
+    const result = triggerFilePicker(nativePickerHostRef.current);
+    setNativeResult(
+      result.opened
+        ? {
+            status: 'running',
+            detail: `自定义按钮已触发隐藏的宜搭上传控件\ntriggerKind: ${result.triggerKind}`,
+          }
+        : {
+            status: 'failed',
+            detail: `${result.code}\n当前 AttachmentField 未暴露可触发的文件输入或按钮`,
+          },
+    );
+  }, []);
+
+  const executeImport = React.useCallback(
+    async (request: FileImportRequest, setResult: React.Dispatch<React.SetStateAction<ResultState>>) => {
+      if (!file) return;
+      setResult({ status: 'running', detail: `正在通过统一接口执行 ${request.channel}` });
+      try {
+        const result = await importService.importFile(file, request);
+        setResult({ status: 'passed', detail: summarize(result) });
+      } catch (error) {
+        setResult({ status: 'failed', detail: errorDetail(error) });
+      }
+    },
+    [file, importService],
+  );
+
+  const runDirect = React.useCallback(async () => {
+    await executeImport({ channel: 'direct-multipart', endpoint: uploadEndpoint }, setDirectResult);
+  }, [executeImport, uploadEndpoint]);
 
   const runJson = React.useCallback(
     async (transport: JsonTransport) => {
-      if (!rows.length) return;
-      setJsonResult({ status: 'running', detail: `正在通过 ${transport} 提交 JSON` });
-      try {
-        const payload = await submitParsedRows(rows, transport);
-        setJsonResult({ status: 'passed', detail: summarize(payload) });
-      } catch (error) {
-        setJsonResult({ status: 'failed', detail: error instanceof Error ? error.message : String(error) });
-      }
+      await executeImport({ channel: 'browser-json', transport }, setJsonResult);
     },
-    [rows],
+    [executeImport],
   );
 
   const runRelay = React.useCallback(async () => {
+    await executeImport({ channel: 'yida-attachment' }, setRelayResult);
+  }, [executeImport]);
+
+  const runDefault = React.useCallback(async () => {
     if (!file) return;
-    setRelayResult({ status: 'running', detail: '正在写入宜搭附件沙箱并验证后端下载' });
+    setJsonResult({ status: 'running', detail: '正在按运行时策略自动选择通道' });
     try {
-      const evidence = await runYidaAttachmentRelay(file);
-      const passed = evidence.backendDownloadSucceeded && evidence.cleanupCompleted;
-      setRelayResult({
-        status: passed ? 'passed' : 'failed',
-        detail: JSON.stringify(evidence, null, 2),
-      });
+      const result = await importService.importFile(file);
+      setJsonResult({ status: 'passed', detail: summarize(result) });
     } catch (error) {
-      setRelayResult({ status: 'failed', detail: error instanceof Error ? error.message : String(error) });
+      setJsonResult({ status: 'failed', detail: errorDetail(error) });
     }
-  }, [file]);
+  }, [file, importService]);
 
   const tableColumns = columns.map((column) => ({ title: column, dataIndex: column, key: column }));
   const nativeProps = {
@@ -159,7 +216,7 @@ function YidaComp() {
             type="info"
             showIcon
             message={`构建环境：${profile.stage}；默认 API 传输：${profile.defaultTransport}`}
-            description="所有实验文件均在内存中生成，只包含 SYN 标记的伪造记录。"
+            description={`页面统一调用 importService.importFile；当前默认策略为 ${importService.defaultRequest.channel}。所有实验文件均在内存中生成，只包含 SYN 标记的伪造记录。`}
           />
 
           <Card>
@@ -172,17 +229,26 @@ function YidaComp() {
               >
                 生成伪造 Excel
               </Button>
-              <Upload
-                accept=".xlsx"
-                maxCount={1}
-                beforeUpload={(selected) => {
-                  void chooseFile(selected as File);
-                  return false;
-                }}
-                showUploadList={false}
+              <Button
+                icon={<FileUp size={16} />}
+                onClick={openBrowserPicker}
+                data-testid="custom-file-picker"
               >
-                <Button icon={<FileUp size={16} />}>选择本地 Excel</Button>
-              </Upload>
+                自定义按钮选择 Excel
+              </Button>
+              <div ref={browserPickerHostRef} className="file-import-picker-host" aria-hidden="true">
+                <input
+                  type="file"
+                  accept=".xlsx"
+                  tabIndex={-1}
+                  data-testid="hidden-browser-file-input"
+                  onChange={(event) => {
+                    const selectedFile = event.currentTarget.files?.[0];
+                    if (selectedFile) void chooseFile(selectedFile);
+                    event.currentTarget.value = '';
+                  }}
+                />
+              </div>
               <Tag color={file ? 'green' : 'default'}>
                 {file ? `${file.name} · ${file.size} bytes` : '尚未选择文件'}
               </Tag>
@@ -212,9 +278,21 @@ function YidaComp() {
                   使用标准 FormData 上传
                 </Button>
                 <div className="file-import-native">
-                  <span className="file-import-native-label">宜搭原生 AttachmentField 自定义 URL 对照</span>
+                  <span className="file-import-native-label">自定义按钮触发隐藏的宜搭 AttachmentField</span>
                   {NativeAttachment ? (
-                    <NativeAttachment {...nativeProps} />
+                    <>
+                      <Button onClick={openNativePicker} data-testid="custom-native-file-picker">
+                        自定义按钮选择宜搭附件
+                      </Button>
+                      <div
+                        ref={nativePickerHostRef}
+                        className="file-import-native-host"
+                        aria-hidden="true"
+                        data-testid="hidden-native-attachment-host"
+                      >
+                        <NativeAttachment {...nativeProps} />
+                      </div>
+                    </>
                   ) : (
                     <Alert type="warning" message="当前运行时没有可渲染的 AttachmentField" />
                   )}
@@ -286,6 +364,9 @@ function YidaComp() {
                   data-testid="json-connector"
                 >
                   宜搭连接器 JSON
+                </Button>
+                <Button disabled={!file} onClick={runDefault} data-testid="import-default">
+                  按环境自动选择
                 </Button>
               </div>
               <pre className="file-import-status" data-testid="json-status" data-status={jsonResult.status}>

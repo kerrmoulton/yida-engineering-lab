@@ -8,6 +8,7 @@ export const FILE_IMPORT_CSS = `
 .file-import-card h2{display:flex;gap:8px;align-items:center;margin:0;font-size:17px}.file-import-card p{color:#68758a;line-height:1.6}.file-import-controls{display:flex;flex-direction:column;gap:10px}.file-import-actions{display:flex;gap:8px;flex-wrap:wrap}
 .file-import-file{padding:12px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;word-break:break-word}.file-import-status{min-height:72px;padding:12px;border-radius:12px;background:#111827;color:#dbeafe;font-size:12px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
 .file-import-preview{border-radius:18px}.file-import-native{padding:12px;border-radius:12px;background:#f7f9fc;border:1px solid #e3e8f1}.file-import-native-label{display:block;margin-bottom:8px;color:#59667a;font-size:13px}
+.file-import-picker-host,.file-import-native-host{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important}
 @media(max-width:980px){.file-import-grid{grid-template-columns:1fr}.file-import-root{padding:18px}}
 @media(max-width:540px){.file-import-root{padding:12px}.file-import-hero{padding:22px}.file-import-hero h1{font-size:25px}}
 `;

@@ -84,6 +84,10 @@ Flowboard 的任务字段契约以 `contracts/flowboard-task.schema.json` 为唯
 
 `platform.fileImportChannels` 是文件导入三通道实验页。它只使用程序生成的 `SYN-*` Excel，分别验证浏览器标准 multipart 直传（公网与 localhost）、浏览器解析后通过 localhost 或“宜搭测试接口”连接器提交 JSON，以及宜搭 OSS 附件中转。实测前两类在真实页面均成功；第三类受部署环境鉴权策略影响，不纳入可复用的本地开发链路。实验在此收敛，真实 OpenAPI 调用默认关闭；应用密钥和 systemToken 不允许进入 Canvas 源码或仓库配置。
 
+三种文件通道统一实现 `importService.importFile(file, options?)`。业务页面省略 `options` 时由运行时 profile 选用适配器：本地开发默认走 localhost multipart，宜搭测试构建默认在浏览器解析后走连接器 JSON；实验页才显式指定通道进行对照。所有适配器返回同一 `FileImportResult`，底层差异只通过 `channel`、`transport`、`phase` 和 `diagnostics` 保留为可观察信息。宜搭附件适配器保留实现和纯契约测试，但默认关闭且不进入真实回归。
+
+导入页面的可见交互不依赖底层上传控件：自定义按钮触发屏幕外的浏览器文件输入；宜搭 `AttachmentField` 也以屏幕外挂载方式接入。真实页面验证确认两颗自定义按钮都能打开文件框，宜搭通道实际命中组件内部的 `input[type=file]`；运行态不支持触发时仍返回明确诊断。
+
 `test:platform:crud:remote` 只操作专用实验表单：最多创建一条唯一标记记录，精确验证创建、查询、详情和更新后，再使用创建响应中的 `formInstId` 删除并确认标记查询为零。写入必须由页面上的两个独立按钮显式触发，页面加载本身始终无写副作用。
 
 `test:platform:js-api-matrix:remote` 在独立页面验证首批 10 个无写副作用 API，并通过独立按钮验证 5 个受控 UI/导航 API 以及 `loadScript`、`loadStyleSheet` 两个外部资源加载 API。导航目标由逻辑页面键注入并限制为同一测试应用；外部资源使用固定测试 URL，并验证加载后的实际 DOM/全局效果。结构化证据只保存能力状态、返回类型、顶层字段名、集合数量和是否有值，不保存用户、实例或字段值。
