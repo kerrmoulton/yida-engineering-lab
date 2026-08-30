@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { createTaskSchema, taskStatusSchema, updateTaskSchema } from '../../shared/task-contract.ts';
+import type { DingTalkOpenApiConfig } from './dingtalk-openapi.ts';
+import { createFileImportRouter, fileImportErrorResponse, isFileImportError } from './file-import.ts';
 import { createTaskStore, type TaskStore } from './store.ts';
 
 declare global {
@@ -23,7 +25,17 @@ function isAllowedOrigin(origin: string, configuredOrigins: string[]) {
   }
 }
 
-export function createApp(options: { store?: TaskStore; allowedOrigins?: string[] } = {}) {
+export function createApp(
+  options: {
+    store?: TaskStore;
+    allowedOrigins?: string[];
+    fileImport?: {
+      dingtalkConfig?: DingTalkOpenApiConfig;
+      loadDingTalkConfig?: () => DingTalkOpenApiConfig;
+      fetchImpl?: typeof fetch;
+    };
+  } = {},
+) {
   const app = express();
   const store = options.store || createTaskStore({ seed: [] });
   const allowedOrigins = options.allowedOrigins || ['http://127.0.0.1:4317', 'http://localhost:4317'];
@@ -36,7 +48,7 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
     response.setHeader('Vary', 'Origin');
     response.setHeader('Access-Control-Allow-Private-Network', 'true');
     response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-    response.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-Request-Id');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-Request-Id,X-Import-Source');
     if (origin && isAllowedOrigin(origin, allowedOrigins)) {
       response.setHeader('Access-Control-Allow-Origin', origin);
     }
@@ -77,6 +89,8 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
       meta: { requestId: request.requestId },
     });
   });
+
+  app.use('/api/import', createFileImportRouter(options.fileImport));
 
   app.get('/api/tasks', (request, response) => {
     const status = request.query.status ? taskStatusSchema.parse(String(request.query.status)) : undefined;
@@ -121,6 +135,10 @@ export function createApp(options: { store?: TaskStore; allowedOrigins?: string[
   app.post('/api/tasks/:id/delete', deleteTask);
 
   app.use((error: unknown, request: Request, response: Response, _next: NextFunction) => {
+    if (isFileImportError(error)) {
+      fileImportErrorResponse(error, request, response);
+      return;
+    }
     if (error && typeof error === 'object' && 'issues' in error && Array.isArray(error.issues)) {
       response.status(400).json({
         success: false,

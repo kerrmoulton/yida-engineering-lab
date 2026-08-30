@@ -15,6 +15,8 @@
     "contract:check": "node scripts/check-contract.mjs",
     "connector:flowboard:generate": "node scripts/generate-flowboard-connector-actions.mjs",
     "connector:flowboard:check": "node scripts/generate-flowboard-connector-actions.mjs --check",
+    "connector:file-import:generate": "node scripts/generate-file-import-connector-actions.mjs",
+    "connector:file-import:check": "node scripts/generate-file-import-connector-actions.mjs --check",
     "test": "node --test tests/tooling.test.mjs",
     "test:flowboard": "node --import tsx --test labs/flowboard-fullstack/server/test/*.test.ts",
     "test:flowboard:web": "vitest run --config labs/flowboard-fullstack/vite.config.mjs",
@@ -76,8 +78,11 @@
     "guard:platform:js-api-matrix": "npm run guard:live -- --page platform.jsApiMatrix",
     "verify:platform:js-api-matrix": "npm run verify:remote -- --page platform.jsApiMatrix",
     "publish:platform:js-api-matrix": "npm run publish:test -- --page platform.jsApiMatrix",
+    "guard:platform:file-import": "npm run guard:live -- --page platform.fileImportChannels",
+    "verify:platform:file-import": "npm run verify:remote -- --page platform.fileImportChannels",
+    "publish:platform:file-import": "npm run publish:test -- --page platform.fileImportChannels",
     "experiment:tailwind:build": "npm run build:canvas",
-    "check": "npm run format:check && npm run lint && npm run contract:generated:check && npm run connector:flowboard:check && npm run typecheck:flowboard && npm run typecheck:platform && npm test && npm run test:flowboard && npm run test:flowboard:web && npm run test:platform && npm run build && npm run build:flowboard:web && npm run contract:check",
+    "check": "npm run format:check && npm run lint && npm run contract:generated:check && npm run connector:flowboard:check && npm run connector:file-import:check && npm run typecheck:flowboard && npm run typecheck:platform && npm test && npm run test:flowboard && npm run test:flowboard:web && npm run test:platform && npm run build && npm run build:flowboard:web && npm run contract:check",
     "check:full": "npm run check && npm run test:flowboard:e2e",
     "release:test": "npm run check && npm run publish:test"
   },
@@ -88,6 +93,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.2.0",
     "@types/node": "^26.4.0",
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
@@ -111,8 +117,11 @@
     "antd": "^5.29.3",
     "express": "^5.2.1",
     "lucide-react": "^1.37.0",
+    "multer": "^2.3.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "read-excel-file": "^9.3.10",
+    "write-excel-file": "^4.1.1"
   },
   "overrides": {
     "vite": {

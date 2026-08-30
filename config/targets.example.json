@@ -35,15 +35,27 @@
     },
     "platform.jsApiMatrix": {
       "formUuid": "FORM-REPLACE-WITH-JS-API-MATRIX-PAGE"
+    },
+    "platform.fileImportChannels": {
+      "formUuid": "FORM-REPLACE-WITH-FILE-IMPORT-CHANNELS-PAGE"
     }
   },
   "services": {
     "flowboardApi": {
       "baseUrl": "http://127.0.0.1:4318/api"
+    },
+    "fileImportApi": {
+      "baseUrl": "http://127.0.0.1:4318/api"
+    },
+    "fileImportPublicApi": {
+      "baseUrl": "https://replace-with-public-experiment-host.example/api"
     }
   },
   "connectors": {
     "flowboardApi": {
+      "connectorId": "Http_REPLACE_WITH_YIDA_TEST_CONNECTOR"
+    },
+    "fileImportApi": {
       "connectorId": "Http_REPLACE_WITH_YIDA_TEST_CONNECTOR"
     }
   },

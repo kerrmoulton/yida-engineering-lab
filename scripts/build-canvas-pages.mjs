@@ -92,6 +92,7 @@ for (const page of manifest.pages) {
       target: 'es2020',
       jsx: 'transform',
       minifySyntax: true,
+      define: contract.esbuildDefines || {},
       external: contract.allowedImports,
       plugins: [
         {

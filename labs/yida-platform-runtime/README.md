@@ -6,18 +6,21 @@
 
 ## 计划页面
 
-| 逻辑页面键                  | 目标                                                 | 默认副作用      |
-| --------------------------- | ---------------------------------------------------- | --------------- |
-| `platform.runtimeInventory` | 清点页面上下文、窗口层级、桥接方法和原生组件名称     | 无              |
-| `platform.nativeComponents` | 逐项挂载并验证成员、部门、附件、图片及门户组件       | 仅用户主动交互  |
-| `platform.apiBridge`        | 验证登录人、表单和流程 API 的白名单桥接              | 默认只读        |
-| `platform.apiCrud`          | 用单条唯一标记记录验证表单 CRUD 与精确清理           | 用户显式触发    |
-| `platform.processSandbox`   | 验证仅本人流程的发起、更新、同意、轨迹和终止生命周期 | 用户显式触发    |
-| `platform.jsApiMatrix`      | 维护 JS API 发现、调用和兼容性覆盖矩阵               | UI 项需显式触发 |
+| 逻辑页面键                    | 目标                                                 | 默认副作用      |
+| ----------------------------- | ---------------------------------------------------- | --------------- |
+| `platform.runtimeInventory`   | 清点页面上下文、窗口层级、桥接方法和原生组件名称     | 无              |
+| `platform.nativeComponents`   | 逐项挂载并验证成员、部门、附件、图片及门户组件       | 仅用户主动交互  |
+| `platform.apiBridge`          | 验证登录人、表单和流程 API 的白名单桥接              | 默认只读        |
+| `platform.apiCrud`            | 用单条唯一标记记录验证表单 CRUD 与精确清理           | 用户显式触发    |
+| `platform.processSandbox`     | 验证仅本人流程的发起、更新、同意、轨迹和终止生命周期 | 用户显式触发    |
+| `platform.jsApiMatrix`        | 维护 JS API 发现、调用和兼容性覆盖矩阵               | UI 项需显式触发 |
+| `platform.fileImportChannels` | 验证 multipart、宜搭附件中转与浏览器解析 JSON 导入   | 用户显式触发    |
 
 当前 L1 首批按真实运行时清点结果验证 `EmployeeField`、`DepartmentField` 和 `SelectField`，每个组件使用独立错误边界。
 
 当前 L1 第二批实测 `AttachmentField`、`ImageField` 和 `DataManageViews` 均由 `DeepYida` 暴露并可在 PC 工作台挂载。附件与图片组件使用官方 `autoUpload=false` 契约完成内存生成文件的选择、清空和受控回填；证据只保留值结构，不保存文件名、内容或 URL。显式授权后的附件上传实验只观察到一次凭据类 `GET 200`，没有文件 `POST/PUT`，随后组件触发 `onError`：说明独立 Canvas 挂载不能仅凭 `autoUpload=true` 复用真实表单字段的内建存储上传，还需要显式上传 URL 或真实表单字段容器。远程上传默认关闭，只有 `YIDA_LAB_ALLOW_SYNTHETIC_UPLOAD=1` 才会使用内存伪造文件尝试。`DataManageViews` 在空数据、只读参数下完成安全挂载；由于没有找到同等级公开属性契约，本阶段不注入业务数据源或臆造配置。
+
+文件导入实验已验证两条完整可用路径：同一个内存伪造 XLSX 可从宜搭 Canvas 通过公网或 localhost 标准 multipart 上传并由 Express 解析为 3 行；浏览器也可本地解析后，通过 localhost 或宜搭 HTTP 连接器提交 JSON。第三条宜搭附件中转路径受部署环境鉴权策略影响，不纳入可复用的本地开发链路；实验在此收敛，`temporaryUrl.enabled` 默认保持 `false`，不再发起真实 OpenAPI 请求。systemToken 只能保存在平台连接器或本地秘密配置中，不能打包进 Canvas。
 
 真实表单字段容器对照实验已经完成：专用 `platform.fileSandbox` 普通表单中的 `AttachmentField` 和 `ImageField` 均能使用同一批内存伪造文件完成成功传输；附件条目和图片缩略图可见，随后都能从字段值中移除。脚本始终不填写必填实验标记、不点击提交，数据管理列表保持零记录。该对照证明宜搭内建上传上下文属于真实表单字段容器，并不会自动下放给独立 Canvas 中手工挂载的同名组件。字段移除只证明本次表单值已清空，不声明底层临时 OSS 对象已立即物理删除。
 

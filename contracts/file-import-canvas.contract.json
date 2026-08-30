@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "sourceExtension": ".canvas.jsx",
+  "entryComponent": "YidaComp",
+  "requiredDefaultExport": true,
+  "allowedImports": ["react", "antd", "lucide-react"],
+  "esbuildDefines": {
+    "global": "globalThis",
+    "setImmediate": "setTimeout"
+  },
+  "forbiddenSourcePatterns": [
+    "window.antd",
+    "window.React",
+    "window.icons",
+    "this.utils.yida",
+    "this.dataSourceMap",
+    "document.cookie",
+    "localStorage.getItem('token')"
+  ],
+  "requiredSourceMarkers": ["data-yida-theme-root", "data-file-import-probe", "export default YidaComp"],
+  "forbidEmoji": true
+}

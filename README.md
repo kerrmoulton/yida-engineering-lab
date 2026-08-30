@@ -50,6 +50,8 @@ npm run test:platform:api:remote
 npm run test:platform:crud:remote
 npm run test:platform:process:remote
 npm run test:platform:js-api-matrix:remote
+npm run publish:platform:file-import
+npm run verify:platform:file-import
 npm run run:platform:process:once
 npm run run:platform:process:terminate-once
 npm run run:platform:process:complete-once
@@ -79,6 +81,8 @@ Flowboard 的任务字段契约以 `contracts/flowboard-task.schema.json` 为唯
 `run:platform:file-lifecycle:once` 是独立的高风险闭环，必须显式设置 `YIDA_LAB_CONFIRM_FILE_LIFECYCLE=1`。它从 Canvas 的标准入口打开原生 submission 表单，只上传内存生成的微型 TXT 和 PNG；上传完成后再填写短唯一标记，提交恰好一条记录，通过宜搭 JS API 读回附件与图片字段结构，只按捕获到的 `formInstId` 删除，并轮询确认该标记归零。结构化证据会脱敏写入 `.cache/playwright/platform-file-lifecycle/`。删除表单记录不被当作底层文件对象已立即物理删除的保证。
 
 `platform.nativeComponents` 页面已经把这条结论封装成标准表单入口：Canvas 通过 `platform.fileSandbox` 逻辑资源键构建 submission 路由，PC 端使用 50% 宽的 `FormOpenContainer` 抽屉，移动端进入原生提交页；iframe 固定带 `isRenderNav=false` 并同步页面主题。默认远程回归只验证抽屉和两个字段加载，不触发文件选择或上传。
+
+`platform.fileImportChannels` 是文件导入三通道实验页。它只使用程序生成的 `SYN-*` Excel，分别验证浏览器标准 multipart 直传（公网与 localhost）、浏览器解析后通过 localhost 或“宜搭测试接口”连接器提交 JSON，以及宜搭 OSS 附件中转。实测前两类在真实页面均成功；第三类受部署环境鉴权策略影响，不纳入可复用的本地开发链路。实验在此收敛，真实 OpenAPI 调用默认关闭；应用密钥和 systemToken 不允许进入 Canvas 源码或仓库配置。
 
 `test:platform:crud:remote` 只操作专用实验表单：最多创建一条唯一标记记录，精确验证创建、查询、详情和更新后，再使用创建响应中的 `formInstId` 删除并确认标记查询为零。写入必须由页面上的两个独立按钮显式触发，页面加载本身始终无写副作用。
 

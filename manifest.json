@@ -16,11 +16,26 @@
       "key": "flowboardApi",
       "name": "Flowboard local API",
       "baseUrl": "http://127.0.0.1:4318/api"
+    },
+    {
+      "key": "fileImportApi",
+      "name": "File import local API",
+      "baseUrl": "http://127.0.0.1:4318/api"
+    },
+    {
+      "key": "fileImportPublicApi",
+      "name": "File import public experiment API",
+      "baseUrl": null
     }
   ],
   "connectors": [
     {
       "key": "flowboardApi",
+      "name": "宜搭测试接口",
+      "connectorId": null
+    },
+    {
+      "key": "fileImportApi",
       "name": "宜搭测试接口",
       "connectorId": null
     }
@@ -193,6 +208,20 @@
       },
       "contract": "contracts/platform-js-api-matrix-canvas.contract.json",
       "baseline": "release/baselines/platform.jsApiMatrix.test.json"
+    },
+    {
+      "key": "platform.fileImportChannels",
+      "name": "宜搭文件导入三通道实验",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/yida-platform-runtime/src/FileImportChannels.canvas.tsx",
+      "source": "labs/yida-platform-runtime/dist/FileImportChannels.canvas.jsx",
+      "build": {
+        "kind": "esbuild-canvas"
+      },
+      "contract": "contracts/file-import-canvas.contract.json",
+      "baseline": "release/baselines/platform.fileImportChannels.test.json"
     }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "dingtalk": {
+    "applicationType": "enterpriseInternal",
+    "appKey": "",
+    "appSecret": ""
+  },
+  "yida": {
+    "appType": "",
+    "systemToken": "",
+    "userId": ""
+  },
+  "process": {
+    "originatorUserId": ""
+  },
+  "temporaryUrl": {
+    "enabled": false,
+    "language": "zh_CN",
+    "timeoutMs": 60000,
+    "accessTokenRefreshSkewSeconds": 120
+  }
+}

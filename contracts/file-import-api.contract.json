@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "prefix": "/api/import",
+  "operations": [
+    {
+      "key": "import.health",
+      "title": "查询文件导入实验 API 健康状态",
+      "direct": { "method": "GET", "path": "/import/health" },
+      "connector": { "operationId": "import_health", "method": "GET", "path": "/api/import/health" },
+      "parameters": []
+    },
+    {
+      "key": "import.rows",
+      "title": "提交浏览器解析后的 Excel 行数据",
+      "direct": { "method": "POST", "path": "/import/rows" },
+      "connector": { "operationId": "import_rows", "method": "POST", "path": "/api/import/rows" },
+      "parameters": [{ "name": "body", "in": "body", "type": "Object", "required": true }]
+    },
+    {
+      "key": "import.fetchYida",
+      "title": "下载宜搭临时附件并解析 Excel",
+      "direct": { "method": "POST", "path": "/import/fetch-yida" },
+      "connector": {
+        "operationId": "import_fetchYida",
+        "method": "POST",
+        "path": "/api/import/fetch-yida"
+      },
+      "parameters": [{ "name": "body", "in": "body", "type": "Object", "required": true }]
+    }
+  ]
+}
