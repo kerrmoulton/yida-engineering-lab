@@ -31,6 +31,11 @@
       "key": "performanceApi",
       "name": "Performance local API",
       "baseUrl": "http://127.0.0.1:4328/api/performance"
+    },
+    {
+      "key": "performanceV2Api",
+      "name": "Performance system local API",
+      "baseUrl": "http://127.0.0.1:4338/api/performance/v2"
     }
   ],
   "connectors": [
@@ -299,6 +304,162 @@
       "build": { "kind": "esbuild-canvas" },
       "contract": "contracts/performance-canvas.contract.json",
       "baseline": "release/baselines/performance.assessment.test.json"
+    },
+    {
+      "key": "performanceV2.dashboard",
+      "name": "绩效运营工作台",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceDashboard.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceDashboard.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.dashboard.test.json"
+    },
+    {
+      "key": "performanceV2.masterData",
+      "name": "绩效基础数据中心",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceMasterData.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceMasterData.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.masterData.test.json"
+    },
+    {
+      "key": "performanceV2.indicatorLibrary",
+      "name": "指标库",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceIndicatorLibrary.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceIndicatorLibrary.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.indicatorLibrary.test.json"
+    },
+    {
+      "key": "performanceV2.indicatorDelivery",
+      "name": "指标量化与下发",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceIndicatorDelivery.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceIndicatorDelivery.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.indicatorDelivery.test.json"
+    },
+    {
+      "key": "performanceV2.personalConfig",
+      "name": "个人指标配置管理",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformancePersonalConfig.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformancePersonalConfig.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.personalConfig.test.json"
+    },
+    {
+      "key": "performanceV2.myIndicators",
+      "name": "我的年度指标",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceMyIndicators.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceMyIndicators.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.myIndicators.test.json"
+    },
+    {
+      "key": "performanceV2.myDataEntry",
+      "name": "我的数据填报",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceMyDataEntry.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceMyDataEntry.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.myDataEntry.test.json"
+    },
+    {
+      "key": "performanceV2.dataEntryAdmin",
+      "name": "数据填报管理",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceDataEntryAdmin.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceDataEntryAdmin.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.dataEntryAdmin.test.json"
+    },
+    {
+      "key": "performanceV2.myTasks",
+      "name": "我的绩效任务",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceMyTasks.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceMyTasks.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.myTasks.test.json"
+    },
+    {
+      "key": "performanceV2.caseManagement",
+      "name": "绩效流程管理",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceCaseManagement.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceCaseManagement.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.caseManagement.test.json"
+    },
+    {
+      "key": "performanceV2.periodOperations",
+      "name": "绩效期间运行管理",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformancePeriodOperations.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformancePeriodOperations.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.periodOperations.test.json"
+    },
+    {
+      "key": "performanceV2.results",
+      "name": "绩效结果与分析",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceResults.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceResults.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.results.test.json"
+    },
+    {
+      "key": "performanceV2.audit",
+      "name": "系统运行与审计",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-system/web/src/PerformanceAudit.canvas.tsx",
+      "source": "labs/performance-system/dist/PerformanceAudit.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-v2-canvas.contract.json",
+      "baseline": "release/baselines/performanceV2.audit.test.json"
     }
   ]
 }
