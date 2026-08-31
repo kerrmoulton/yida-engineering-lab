@@ -38,6 +38,24 @@
     },
     "platform.fileImportChannels": {
       "formUuid": "FORM-REPLACE-WITH-FILE-IMPORT-CHANNELS-PAGE"
+    },
+    "performance.overview": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-OVERVIEW"
+    },
+    "performance.people": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-PEOPLE"
+    },
+    "performance.indicators": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-INDICATORS"
+    },
+    "performance.configuration": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-CONFIGURATION"
+    },
+    "performance.dataEntry": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-DATA-ENTRY"
+    },
+    "performance.assessment": {
+      "formUuid": "FORM-REPLACE-WITH-PERFORMANCE-ASSESSMENT"
     }
   },
   "services": {
@@ -49,6 +67,9 @@
     },
     "fileImportPublicApi": {
       "baseUrl": "https://replace-with-public-experiment-host.example/api"
+    },
+    "performanceApi": {
+      "baseUrl": "http://127.0.0.1:4328/api/performance"
     }
   },
   "connectors": {

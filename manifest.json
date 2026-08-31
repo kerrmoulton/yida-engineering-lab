@@ -26,6 +26,11 @@
       "key": "fileImportPublicApi",
       "name": "File import public experiment API",
       "baseUrl": null
+    },
+    {
+      "key": "performanceApi",
+      "name": "Performance local API",
+      "baseUrl": "http://127.0.0.1:4328/api/performance"
     }
   ],
   "connectors": [
@@ -222,6 +227,78 @@
       },
       "contract": "contracts/file-import-canvas.contract.json",
       "baseline": "release/baselines/platform.fileImportChannels.test.json"
+    },
+    {
+      "key": "performance.overview",
+      "name": "绩效运行总览",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformanceOverview.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformanceOverview.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.overview.test.json"
+    },
+    {
+      "key": "performance.people",
+      "name": "人员与组织",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformancePeople.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformancePeople.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.people.test.json"
+    },
+    {
+      "key": "performance.indicators",
+      "name": "绩效指标与量化",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformanceIndicators.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformanceIndicators.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.indicators.test.json"
+    },
+    {
+      "key": "performance.configuration",
+      "name": "个人绩效配置",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformanceConfiguration.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformanceConfiguration.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.configuration.test.json"
+    },
+    {
+      "key": "performance.dataEntry",
+      "name": "绩效数据与自评",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformanceDataEntry.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformanceDataEntry.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.dataEntry.test.json"
+    },
+    {
+      "key": "performance.assessment",
+      "name": "绩效评价与结算",
+      "formUuid": null,
+      "formType": "display",
+      "managementMode": "GIT_MANAGED",
+      "authorSource": "labs/performance-fullstack/web/src/PerformanceAssessment.canvas.tsx",
+      "source": "labs/performance-fullstack/dist/PerformanceAssessment.canvas.jsx",
+      "build": { "kind": "esbuild-canvas" },
+      "contract": "contracts/performance-canvas.contract.json",
+      "baseline": "release/baselines/performance.assessment.test.json"
     }
   ]
 }

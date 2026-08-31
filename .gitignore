@@ -8,6 +8,7 @@ config/targets.local.json
 release/baseline.*.json
 release/baselines/*.test.json
 !release/baseline.example.json
+prd/*/build-manifest.json
 .env.local
 .env.*.local
 .DS_Store
